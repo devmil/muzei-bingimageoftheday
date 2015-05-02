@@ -1,0 +1,62 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.devmil.muzei.bingimageofthedayartsource">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Required by RemoteMuzeiArtSource -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="de.devmil.muzei.bingimageofthedayartsource.SettingsActivity"
+            android:exported="true"
+            android:label="@string/app_name" >
+        </activity>
+
+        <activity
+            android:name=".LicenseInfoActivity"
+            android:exported="false"
+            android:label="@string/license_info_activity_label">
+        </activity>
+
+        <service
+            android:name="de.devmil.muzei.bingimageofthedayartsource.BingImageOfTheDayArtSource"
+            android:description="@string/source_description"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@drawable/ic_source" >
+            <intent-filter>
+                <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
+            </intent-filter>
+            <meta-data
+                android:name="settingsActivity"
+                android:value="de.devmil.muzei.bingimageofthedayartsource.SettingsActivity" />
+            <meta-data
+                android:name="color"
+                android:value="#ace5cc" />
+        </service>
+
+        <provider
+            android:name="de.devmil.muzei.bingimageofthedayartsource.BingImageContentProvider"
+            android:authorities="de.devmil.muzei.bingimageofthedayartsource.provider.BingImages"
+            android:exported="true" >
+        </provider>
+
+        <receiver
+            android:name="de.devmil.muzei.bingimageofthedayartsource.BootReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

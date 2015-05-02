@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bing for Muzei</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="source_description">Bing Image of the Day</string>
+    <string name="setting_landscape">Landscape</string>
+    <string name="setting_portrait">Portrait</string>
+    <string name="fragment_settings_orientation_label">Orientation</string>
+    <string name="fragment_settings_market_label">Market</string>
+    <string name="fragment_settings_button_license_label">About</string>
+    <string name="copyright">© 2015 Devmil Solutions - Michael Lamers</string>
+    <string name="activity_license_info_license_info_headline">License Info</string>
+    <string name="license_info_activity_label">About</string>
+</resources>

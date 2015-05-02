@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "de.devmil.muzei.bingimageofthedayartsource"
+        minSdkVersion 17
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    signingConfigs {
+        release {
+            def Properties localProps = new Properties()
+            localProps.load(new FileInputStream(file('../local.properties')))
+            def Properties keyProps = new Properties()
+            if (localProps['keystore.props.file'] != null) {
+                keyProps.load(new FileInputStream(file(localProps['keystore.props.file'])))
+            }
+            storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
+            keyAlias keyProps["alias"]
+            storePassword keyProps["storePass"]
+            keyPassword keyProps["pass"]
+        }
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false //EventBus seems not to work using the current config
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+project.archivesBaseName = "muzei_biot"
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    compile 'com.google.android.apps.muzei:muzei-api:+'
+    compile 'com.squareup.retrofit:retrofit:1.3.0'
+    compile 'de.greenrobot:eventbus:2.2.0'
+    compile project(':volley')
+}
