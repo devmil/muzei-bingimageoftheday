@@ -362,21 +362,21 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
         }
 
         public void onEventBackgroundThread(RequestPortraitSettingChangedEvent e) {
-            //this transition (source thread -> here -> Service intent) is needed because the service doesn't have a context
-            //when this event is fired from the settings UI
-            Intent thisServiceIntent = new Intent();
-            thisServiceIntent.setClass(e.getContext(), BingImageOfTheDayArtSource.class);
-            thisServiceIntent.setAction(ACTION_REQUESTUPDATE);
-            e.getContext().startService(thisServiceIntent);
+            requestUpdate(e.getContext());
         }
 
         public void onEventBackgroundThread(RequestMarketSettingChangedEvent e) {
+            requestUpdate(e.getContext());
+        }
+
+        private void requestUpdate(Context context)
+        {
             //this transition (source thread -> here -> Service intent) is needed because the service doesn't have a context
             //when this event is fired from the settings UI
             Intent thisServiceIntent = new Intent();
-            thisServiceIntent.setClass(e.getContext(), BingImageOfTheDayArtSource.class);
+            thisServiceIntent.setClass(context, BingImageOfTheDayArtSource.class);
             thisServiceIntent.setAction(ACTION_REQUESTUPDATE);
-            e.getContext().startService(thisServiceIntent);
+            context.startService(thisServiceIntent);
         }
 
     }
