@@ -65,7 +65,7 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
     private static final String PREF_CURRENT_MARKET = "art_source_runtime_current_market";
     private static final String PREF_CURRENT_ORIENTATION_PORTRAIT = "art_source_runtime_current_orientation_portrait";
 
-    public static final BingMarket DEFAULT_MARKET = BingMarket.DE_DE;
+    public static final BingMarket DEFAULT_MARKET = BingMarket.EN_US;
 
     private static final String ACTION_REQUESTUPDATE = "de.devmil.muzei.bingimageofthedayartsource.ACTION_REQUESTUPDATE";
     private static final String ACTION_ENSUREINITIALIZED = "de.devmil.muzei.bingimageofthedayartsource.ACTION_ENSURE_INITIALIZED";

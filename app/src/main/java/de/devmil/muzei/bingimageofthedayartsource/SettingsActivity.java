@@ -35,6 +35,8 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestMarketSettingChangedEvent;
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestPortraitSettingChangedEvent;
 import de.greenrobot.event.EventBus;
@@ -142,7 +144,24 @@ public class SettingsActivity extends Activity {
 
         private int GetMarketSpinnerSelection(){
             String marketCode = BingImageOfTheDayArtSource.getSharedPreferences(getActivity())
-                    .getString(BingImageOfTheDayArtSource.PREF_MARKET_CODE, BingImageOfTheDayArtSource.DEFAULT_MARKET.getMarketCode());
+                    .getString(BingImageOfTheDayArtSource.PREF_MARKET_CODE, null);
+
+            if(marketCode == null) {
+                // Try find best match based on local
+                Locale currentLocale = getResources().getConfiguration().locale;
+                if (currentLocale != null) {
+                    String isoCode = currentLocale.toString().replace("_","-");
+                    BingMarket market = BingMarket.fromMarketCode(isoCode);
+                    if(market != BingMarket.Unknown){
+                        marketCode = market.getMarketCode();
+                    }
+                }
+
+                // no best match? Default!
+                if(marketCode == null) {
+                    marketCode = BingImageOfTheDayArtSource.DEFAULT_MARKET.getMarketCode();
+                }
+            }
 
             for (int i = 0; i<marketAdapter.getCount(); i++)
                 if(marketAdapter.getItem(i).getMarketCode().equals(marketCode))
