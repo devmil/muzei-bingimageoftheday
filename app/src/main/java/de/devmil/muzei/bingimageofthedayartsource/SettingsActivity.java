@@ -19,7 +19,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,8 +33,6 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestMarketSettingChangedEvent;
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestPortraitSettingChangedEvent;
@@ -95,8 +92,8 @@ public class SettingsActivity extends Activity {
             spMarket.setSelection(GetMarketSpinnerSelection());
             btnLicense = (Button)rootView.findViewById(R.id.fragment_settings_button_license);
 
-            final SharedPreferences prefs = BingImageOfTheDayArtSource.getSharedPreferences(inflater.getContext());
-            boolean portrait = prefs.getBoolean(BingImageOfTheDayArtSource.PREF_ORIENTATION_PORTRAIT, BingImageOfTheDayArtSource.isPortraitDefault(inflater.getContext()));
+            final Settings settings = new Settings(getActivity(), BingImageOfTheDayArtSource.getSharedPreferences(getActivity()));
+            boolean portrait = settings.isOrientationPortrait();
 
             rbLandscape.setChecked(!portrait);
             rbPortrait.setChecked(portrait);
@@ -107,8 +104,7 @@ public class SettingsActivity extends Activity {
                     if (!checked)
                         return;
                     boolean portrait = compoundButton == rbPortrait;
-                    SharedPreferences prefs = BingImageOfTheDayArtSource.getSharedPreferences(getActivity());
-                    prefs.edit().putBoolean(BingImageOfTheDayArtSource.PREF_ORIENTATION_PORTRAIT, portrait).commit();
+                    settings.setIsOrientationPortrait(portrait);
                     EventBus.getDefault().post(new RequestPortraitSettingChangedEvent(getActivity()));
                 }
             };
@@ -119,7 +115,7 @@ public class SettingsActivity extends Activity {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                     BingMarket market = marketAdapter.getItem(i);
-                    prefs.edit().putString(BingImageOfTheDayArtSource.PREF_MARKET_CODE, market.getMarketCode()).commit();
+                    settings.setBingMarket(market);
                     EventBus.getDefault().post(new RequestMarketSettingChangedEvent(getActivity()));
                 }
 
@@ -143,25 +139,9 @@ public class SettingsActivity extends Activity {
         }
 
         private int GetMarketSpinnerSelection(){
-            String marketCode = BingImageOfTheDayArtSource.getSharedPreferences(getActivity())
-                    .getString(BingImageOfTheDayArtSource.PREF_MARKET_CODE, null);
+            Settings settings = new Settings(getActivity(), BingImageOfTheDayArtSource.getSharedPreferences(getActivity()));
 
-            if(marketCode == null) {
-                // Try find best match based on local
-                Locale currentLocale = getResources().getConfiguration().locale;
-                if (currentLocale != null) {
-                    String isoCode = currentLocale.toString().replace("_","-");
-                    BingMarket market = BingMarket.fromMarketCode(isoCode);
-                    if(market != BingMarket.Unknown){
-                        marketCode = market.getMarketCode();
-                    }
-                }
-
-                // no best match? Default!
-                if(marketCode == null) {
-                    marketCode = BingImageOfTheDayArtSource.DEFAULT_MARKET.getMarketCode();
-                }
-            }
+            String marketCode = settings.getBingMarket().getMarketCode();
 
             for (int i = 0; i<marketAdapter.getCount(); i++)
                 if(marketAdapter.getItem(i).getMarketCode().equals(marketCode))

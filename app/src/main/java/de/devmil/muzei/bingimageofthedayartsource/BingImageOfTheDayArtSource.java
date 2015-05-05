@@ -18,7 +18,6 @@ package de.devmil.muzei.bingimageofthedayartsource;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.IBinder;
 
@@ -33,10 +32,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import de.devmil.common.utils.LogUtil;
 import de.devmil.muzei.bingimageofthedayartsource.cache.BingImageCache;
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestMarketSettingChangedEvent;
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestPortraitSettingChangedEvent;
-import de.devmil.common.utils.LogUtil;
 import de.greenrobot.event.EventBus;
 
 import static de.devmil.common.utils.LogUtil.LOGD;
@@ -58,14 +57,6 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
     private static final String TAG = LogUtil.makeLogTag(BingImageOfTheDayArtSource.class);
 
     private static final String SOURCE_NAME = "BingImageOfTheDayArtSource";
-
-    public static final String PREF_MARKET_CODE = "art_source_settings_market_code";
-    public static final String PREF_ORIENTATION_PORTRAIT = "art_source_settings_orientation_portrait";
-    private static final String PREF_CURRENT_IMAGE_NUM = "art_source_runtime_current_image_number";
-    private static final String PREF_CURRENT_MARKET = "art_source_runtime_current_market";
-    private static final String PREF_CURRENT_ORIENTATION_PORTRAIT = "art_source_runtime_current_orientation_portrait";
-
-    public static final BingMarket DEFAULT_MARKET = BingMarket.EN_US;
 
     private static final String ACTION_REQUESTUPDATE = "de.devmil.muzei.bingimageofthedayartsource.ACTION_REQUESTUPDATE";
     private static final String ACTION_ENSUREINITIALIZED = "de.devmil.muzei.bingimageofthedayartsource.ACTION_ENSURE_INITIALIZED";
@@ -102,20 +93,20 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
 
     @Override
     protected void onTryUpdate(int updateReason) throws RetryException {
-        SharedPreferences prefs = getSharedPreferences(getApplicationContext(), SOURCE_NAME); // getSharedPreferences();
+        Settings settings = new Settings(this, getSharedPreferences(getApplicationContext(), SOURCE_NAME));
 
         if(_Cache == null)
             _Cache = new BingImageCache(getApplicationContext());
 
         LOGD(TAG, "Update try received");
 
-        BingMarket market = BingMarket.fromMarketCode(prefs.getString(PREF_MARKET_CODE, DEFAULT_MARKET.getMarketCode()));
-        BingMarket currentMarket = BingMarket.fromMarketCode(prefs.getString(PREF_CURRENT_MARKET, BingMarket.Unknown.getMarketCode()));
+        BingMarket market = settings.getBingMarket();
+        BingMarket currentMarket = settings.getCurrentBingMarket();
         boolean marketChanged = market != currentMarket;
         LOGD(TAG, String.format("Market changed: %b", marketChanged));
 
-        boolean requestPortraitMode = prefs.getBoolean(BingImageOfTheDayArtSource.PREF_ORIENTATION_PORTRAIT, isPortraitDefault(getApplicationContext()));
-        boolean currentRequestPortraitMode = prefs.getBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, requestPortraitMode);
+        boolean requestPortraitMode = settings.isOrientationPortrait();
+        boolean currentRequestPortraitMode = settings.isCurrentOrientationPortrait();
         LOGD(TAG, String.format("request portrait mode: %b", requestPortraitMode));
         boolean requestPortraitModeChanged = requestPortraitMode != currentRequestPortraitMode;
 
@@ -154,7 +145,7 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
         }
         _Cache.ensureMissingImages();
 
-        int lastNumber = prefs.getInt(PREF_CURRENT_IMAGE_NUM, 0);
+        int lastNumber = settings.getCurrentImageNumber();
 
         boolean userNext = updateReason == UPDATE_REASON_USER_NEXT;
         boolean hasBeenScheduled = updateReason == UPDATE_REASON_SCHEDULED;
@@ -196,12 +187,11 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
             String currentToken = "";
             if (getCurrentArtwork() != null)
                 currentToken = getCurrentArtwork().getToken();
-            prefs
-                    .edit()
-                    .putInt(PREF_CURRENT_IMAGE_NUM, imageNumberToUse)
-                    .putString(PREF_CURRENT_MARKET, market.getMarketCode())
-                    .putBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, requestPortraitMode)
-                    .commit();
+
+            settings.setCurrentImageNumber(imageNumberToUse);
+            settings.setCurrentBingMarket(market);
+            settings.setIsCurrentOrientationPortrait(requestPortraitMode);
+
             boolean newImage = false;
 
             if (!imgToken.equals(currentToken)) {
@@ -241,13 +231,6 @@ public class BingImageOfTheDayArtSource extends RemoteMuzeiArtSource {
 
     public static SharedPreferences getSharedPreferences(Context context) {
         return MuzeiArtSource.getSharedPreferences(context, SOURCE_NAME);
-    }
-
-    public static boolean isPortraitDefault(Context context)
-    {
-        boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE);
-        boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
-        return !(xlarge | large);
     }
 
     private String createToken(Date date, BingMarket market, boolean portrait) {
