@@ -28,3 +28,4 @@ proguard/
 
 # Key information
 Key/*
+.idea/
