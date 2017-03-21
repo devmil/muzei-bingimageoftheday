@@ -29,3 +29,6 @@ proguard/
 # Key information
 Key/*
 .idea/
+/.project
+
+Thumbs.db
