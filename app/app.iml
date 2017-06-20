@@ -104,9 +104,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
     <orderEntry type="library" exported="" name="eventbus-2.2.0" level="project" />
+    <orderEntry type="library" exported="" name="volley-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="muzei-api-2.0" level="project" />
     <orderEntry type="library" exported="" name="retrofit-1.3.0" level="project" />
-    <orderEntry type="module" module-name="volley" exported="" />
     <orderEntry type="library" exported="" name="android-android-25" level="project" />
   </component>
 </module>

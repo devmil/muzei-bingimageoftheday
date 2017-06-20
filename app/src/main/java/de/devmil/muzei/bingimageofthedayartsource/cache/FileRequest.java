@@ -15,15 +15,11 @@
  */
 package de.devmil.muzei.bingimageofthedayartsource.cache;
 
-import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Simple FileRequest that handles the download of a file
