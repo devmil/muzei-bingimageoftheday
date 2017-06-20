@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Fexdev
+ * Copyright 2014 Devmil Solutions
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource.events;
+package de.devmil.muzei.bingimageofthedayartsource.events
 
-import android.content.Context;
+import android.content.Context
 
 /**
- * This Bus Event gets fired when the setting for the Bing Image Of the day market has been changed
+ * Created by devmil on 21.02.14.
+
+ * This Bus event gets triggered whenever the setting for the orientation changes
  */
-public class RequestMarketSettingChangedEvent {
-    private Context _Context;
-
-    public RequestMarketSettingChangedEvent(Context context)
-    {
-        _Context = context;
-    }
-
-    public Context getContext()
-    {
-        return _Context;
-    }
-}
+class RequestPortraitSettingChangedEvent(val context: Context)

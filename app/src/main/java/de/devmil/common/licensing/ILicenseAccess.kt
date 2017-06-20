@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.common.licensing;
+package de.devmil.common.licensing
 
 /**
- * Created by devmil on 18.04.14.
- */
-public interface ILicenseAccess {
+* Created by devmil on 18.04.14.
+*/
+interface ILicenseAccess {
 
-    LicenseDefinition getLicense(String identifier);
+    fun getLicense(identifier: String): LicenseDefinition
 }

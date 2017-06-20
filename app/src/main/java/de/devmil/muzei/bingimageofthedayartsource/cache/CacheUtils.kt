@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource;
+package de.devmil.muzei.bingimageofthedayartsource.cache
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
+import android.content.Context
+import android.os.Environment
+
+import java.io.File
 
 /**
- * This class ensures that the BingImageOfTheDayArtSource is up and running after the device got booted
- */
-public class BootReceiver extends BroadcastReceiver {
-    public BootReceiver() {
-    }
+* Created by devmil on 24.02.14.
+*/
+object CacheUtils {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        BingImageOfTheDayArtSource.ensureInitialized(context);
+    fun getCacheDirectory(context: Context?): File? {
+        if (context == null)
+            return null
+
+        if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
+            return context.externalCacheDir
+        }
+
+        return context.cacheDir
     }
 }
