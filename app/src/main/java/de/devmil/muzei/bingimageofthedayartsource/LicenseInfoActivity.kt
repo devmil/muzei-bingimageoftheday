@@ -15,10 +15,10 @@
  */
 package de.devmil.muzei.bingimageofthedayartsource
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -30,18 +30,10 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ListView
-import android.widget.ScrollView
-import android.widget.TextView
-
+import android.widget.*
 import de.devmil.common.licensing.LicenseManager
 import de.devmil.common.licensing.PackageInfo
 import de.devmil.common.utils.LogUtil
-
-import de.devmil.common.utils.LogUtil.LOGW
 
 class LicenseInfoActivity : Activity() {
 
@@ -79,20 +71,21 @@ class LicenseInfoActivity : Activity() {
             var licenseButton: Button? = null
         }
 
+        @SuppressLint("InflateParams")
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            var convertView = convertView
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.activity_license_info_entry, null)
+            var effectiveconvertView = convertView
+            if (effectiveconvertView == null) {
+                effectiveconvertView = LayoutInflater.from(context).inflate(R.layout.activity_license_info_entry, null)
                 val vh = ViewHolder()
-                vh.image = convertView!!.findViewById(R.id.activity_license_info_entry_image) as ImageView
-                vh.name = convertView.findViewById(R.id.activity_license_info_entry_name) as TextView
-                vh.copyright = convertView.findViewById(R.id.activity_license_info_entry_copyright) as TextView
-                vh.url = convertView.findViewById(R.id.activity_license_info_entry_url) as TextView
-                vh.licenseButton = convertView.findViewById(R.id.activity_license_info_entry_licensebutton) as Button
-                convertView.tag = vh
+                vh.image = effectiveconvertView!!.findViewById(R.id.activity_license_info_entry_image) as ImageView
+                vh.name = effectiveconvertView.findViewById(R.id.activity_license_info_entry_name) as TextView
+                vh.copyright = effectiveconvertView.findViewById(R.id.activity_license_info_entry_copyright) as TextView
+                vh.url = effectiveconvertView.findViewById(R.id.activity_license_info_entry_url) as TextView
+                vh.licenseButton = effectiveconvertView.findViewById(R.id.activity_license_info_entry_licensebutton) as Button
+                effectiveconvertView.tag = vh
             }
 
-            val holder = convertView.tag as ViewHolder
+            val holder = effectiveconvertView.tag as ViewHolder
 
             val item = getItem(position)
 
@@ -101,6 +94,7 @@ class LicenseInfoActivity : Activity() {
             holder.image!!.setImageResource(drawableId)
             holder.name!!.text = item.name
             holder.copyright!!.text = item.copyright
+            @Suppress("DEPRECATION")
             holder.url!!.text = Html.fromHtml("<a href=\"" + item.url + "\">" + item.url + "</a>")
             holder.url!!.autoLinkMask = Linkify.WEB_URLS
             holder.url!!.tag = item
@@ -128,12 +122,12 @@ class LicenseInfoActivity : Activity() {
                 val builder = AlertDialog.Builder(context)
                 val dlg = builder.setTitle(pi.license.name)
                         .setView(scrollView)
-                        .setNegativeButton("OK") { dialog, which -> dialog.dismiss() }
+                        .setNegativeButton("OK") { dialog, _ -> dialog.dismiss() }
                         .create()
                 dlg.show()
             }
 
-            return convertView
+            return effectiveconvertView
         }
     }
 

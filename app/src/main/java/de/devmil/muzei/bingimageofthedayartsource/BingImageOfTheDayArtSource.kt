@@ -20,22 +20,16 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.IBinder
-
 import com.google.android.apps.muzei.api.Artwork
 import com.google.android.apps.muzei.api.MuzeiArtSource
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource
-
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.ArrayList
-import java.util.Calendar
-import java.util.Date
-
 import de.devmil.common.utils.LogUtil
 import de.devmil.muzei.bingimageofthedayartsource.cache.BingImageCache
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestMarketSettingChangedEvent
 import de.devmil.muzei.bingimageofthedayartsource.events.RequestPortraitSettingChangedEvent
 import de.greenrobot.event.EventBus
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Muzei Art source for Bing images of the day.
@@ -43,11 +37,11 @@ import de.greenrobot.event.EventBus
  */
 class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") {
 
-    override fun onStart(intent: Intent?, startId: Int) {
-        super.onStart(intent, startId)
-
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val result = super.onStartCommand(intent, flags, startId)
         if (intent != null && (ACTION_REQUESTUPDATE == intent.action || ACTION_ENSUREINITIALIZED == intent.action))
             refreshImage()
+        return result
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -93,7 +87,7 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
             val metadata = retriever.bingImageOfTheDayMetadata
 
             //if there is a result
-            if (metadata != null && metadata.size >= 1) {
+            if (metadata != null && metadata.isNotEmpty()) {
                 //build the cache metadata
                 LogUtil.LOGD(TAG, "metadata received")
                 val entries = ArrayList<BingImageCache.CacheEntry>()
@@ -192,13 +186,13 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
     }
 
     private fun createToken(date: Date, market: BingMarket, portrait: Boolean): String {
-        val df = SimpleDateFormat("MM/dd/yyyy")
+        val df = SimpleDateFormat("MM/dd/yyyy", Locale.US)
 
         return String.format("%s|%s|%b", market.marketCode, df.format(date), portrait)
     }
 
     private fun getImageTitle(imageDate: Date): String {
-        val df = SimpleDateFormat("MM/dd/yyyy")
+        val df = SimpleDateFormat("MM/dd/yyyy", Locale.US)
 
         return "Bing: " + df.format(imageDate.time)
     }
@@ -212,7 +206,7 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
     private fun requestNextImageUpdate(imageStartDate: Date): Calendar {
         val nextUpdate = getNextUpdate(imageStartDate)
 
-        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
 
         LogUtil.LOGD(TAG, String.format("next update: %s", sdf.format(nextUpdate.time)))
         scheduleUpdate(nextUpdate.timeInMillis)
@@ -267,7 +261,7 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
         val nextUpdate = Calendar.getInstance()
         nextUpdate.add(Calendar.MINUTE, FAST_RETRY_MINUTES)
 
-        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
         LogUtil.LOGD(TAG, String.format("next update: %s", sdf.format(nextUpdate.time)))
 
         scheduleUpdate(nextUpdate.timeInMillis)
@@ -279,7 +273,7 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
         val nextUpdate = Calendar.getInstance()
         nextUpdate.add(Calendar.MILLISECOND, 500)
 
-        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
+        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
         LogUtil.LOGD(TAG, String.format("next update: %s", sdf.format(nextUpdate.time)))
         //this one doesn't get stored so that it isn't a daily schedule (that would reset the image number)
         scheduleUpdate(nextUpdate.timeInMillis)

@@ -29,7 +29,6 @@ import de.devmil.muzei.bingimageofthedayartsource.BuildConfig
  * Helper methods that make logging more consistent throughout the app.
  */
 object LogUtil {
-    private val TAG = makeLogTag(LogUtil::class.java)
 
     private val LOG_PREFIX = "muzei_biot_"
     private val LOG_PREFIX_LENGTH = LOG_PREFIX.length

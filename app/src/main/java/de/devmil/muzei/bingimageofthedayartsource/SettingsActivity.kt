@@ -15,6 +15,7 @@
  */
 package de.devmil.muzei.bingimageofthedayartsource
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Fragment
 import android.content.Context
@@ -93,8 +94,8 @@ class SettingsActivity : Activity() {
             val listener = CompoundButton.OnCheckedChangeListener { compoundButton, checked ->
                 if (!checked)
                     return@OnCheckedChangeListener
-                val portrait = compoundButton === rbPortrait
-                settings.isOrientationPortrait = portrait
+                val isPortrait = compoundButton === rbPortrait
+                settings.isOrientationPortrait = isPortrait
                 EventBus.getDefault().post(RequestPortraitSettingChangedEvent(activity))
             }
 
@@ -127,10 +128,9 @@ class SettingsActivity : Activity() {
 
             val marketCode = settings.bingMarket.marketCode
 
-            for (i in 0..marketAdapter!!.count - 1)
-                if (marketAdapter!!.getItem(i)!!.marketCode == marketCode)
-                    return i
-            return 0
+            return (0..marketAdapter!!.count - 1)
+                        .firstOrNull { marketAdapter!!.getItem(it)!!.marketCode == marketCode }
+                    ?: 0
         }
     }
 
@@ -145,18 +145,19 @@ class SettingsActivity : Activity() {
             return getView(position, convertView, parent)
         }
 
+        @SuppressLint("InflateParams")
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            var convertView = convertView
+            var effectiveConvertView = convertView
 
             val holder: ViewHolder
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.settings_ab_spinner_list_item_dropdown, null)
+            if (effectiveConvertView == null) {
+                effectiveConvertView = LayoutInflater.from(context).inflate(R.layout.settings_ab_spinner_list_item_dropdown, null)
                 holder = ViewHolder()
-                holder.imageView = convertView!!.findViewById(R.id.settings_ab_spinner_list_item_dropdown_icon) as ImageView
-                holder.textView = convertView.findViewById(R.id.settings_ab_spinner_list_item_dropdown_text) as TextView
-                convertView.tag = holder
+                holder.imageView = effectiveConvertView!!.findViewById(R.id.settings_ab_spinner_list_item_dropdown_icon) as ImageView
+                holder.textView = effectiveConvertView.findViewById(R.id.settings_ab_spinner_list_item_dropdown_text) as TextView
+                effectiveConvertView.tag = holder
             } else {
-                holder = convertView.tag as ViewHolder
+                holder = effectiveConvertView.tag as ViewHolder
             }
 
             val market = getItem(position)
@@ -164,7 +165,7 @@ class SettingsActivity : Activity() {
             holder.textView!!.text = market!!.toString()
             holder.imageView!!.setImageResource(market.logoResourceId)
 
-            return convertView
+            return effectiveConvertView
         }
     }
 }

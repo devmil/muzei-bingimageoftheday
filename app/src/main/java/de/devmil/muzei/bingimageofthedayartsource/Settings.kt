@@ -4,14 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 
-import java.util.Locale
-
 /**
- * Created by michaellamers on 05.05.15.
- */
+* Created by michaellamers on 05.05.15.
+*/
 class Settings(private val _Context: Context, private val _Preferences: SharedPreferences) {
 
-    // Try find best match based on local
+    @Suppress("DEPRECATION")
+            // Try find best match based on local
     // no best match? Default!
     var bingMarket: BingMarket
         get() {
@@ -33,7 +32,7 @@ class Settings(private val _Context: Context, private val _Preferences: SharedPr
             return BingMarket.fromMarketCode(marketCode)
         }
         set(bingMarket) {
-            _Preferences.edit().putString(PREF_MARKET_CODE, bingMarket.marketCode).commit()
+            _Preferences.edit().putString(PREF_MARKET_CODE, bingMarket.marketCode).apply()
         }
 
     var currentBingMarket: BingMarket
@@ -42,13 +41,13 @@ class Settings(private val _Context: Context, private val _Preferences: SharedPr
             _Preferences
                     .edit()
                     .putString(PREF_CURRENT_MARKET, currentBingMarket.marketCode)
-                    .commit()
+                    .apply()
         }
 
     var isOrientationPortrait: Boolean
         get() = _Preferences.getBoolean(PREF_ORIENTATION_PORTRAIT, isPortraitDefault(_Context))
         set(isOrientationPortrait) {
-            _Preferences.edit().putBoolean(PREF_ORIENTATION_PORTRAIT, isOrientationPortrait).commit()
+            _Preferences.edit().putBoolean(PREF_ORIENTATION_PORTRAIT, isOrientationPortrait).apply()
         }
 
     var isCurrentOrientationPortrait: Boolean
@@ -57,7 +56,7 @@ class Settings(private val _Context: Context, private val _Preferences: SharedPr
             _Preferences
                     .edit()
                     .putBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, isCurrentOrientationPortrait)
-                    .commit()
+                    .apply()
         }
 
     var currentImageNumber: Int
@@ -66,7 +65,7 @@ class Settings(private val _Context: Context, private val _Preferences: SharedPr
             _Preferences
                     .edit()
                     .putInt(PREF_CURRENT_IMAGE_NUM, currentImageNumber)
-                    .commit()
+                    .apply()
         }
 
     companion object {
