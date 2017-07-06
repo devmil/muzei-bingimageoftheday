@@ -30,7 +30,7 @@ android {
         }
         release {
             minifyEnabled false //EventBus seems not to work using the current config
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
