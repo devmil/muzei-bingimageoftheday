@@ -35,6 +35,10 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 project.archivesBaseName = "muzei_biot"
