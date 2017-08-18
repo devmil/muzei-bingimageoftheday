@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource.cache
+package de.devmil.muzei.bingimageoftheday.cache
 
 import android.content.Context
 import android.net.Uri
@@ -31,7 +31,7 @@ import java.lang.ref.WeakReference
 import java.util.ArrayList
 import java.util.Calendar
 
-import de.devmil.muzei.bingimageofthedayartsource.utils.FileUtils
+import de.devmil.muzei.bingimageoftheday.utils.FileUtils
 import de.devmil.common.utils.LogUtil
 
 /**
@@ -40,7 +40,7 @@ import de.devmil.common.utils.LogUtil
  * This class represents the image cache. It controls the (serialized) metadata
  * and triggers the cleanup / image download depending on the metadata it gets
  */
-class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinishedListener {
+class BingImageCache(context: Context) {
 
     class CacheEntry {
         var uri: Uri? = null
@@ -58,7 +58,6 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
             this.copyright = copyright
         }
 
-        @Throws(JSONException::class)
         fun toJSONObject(): JSONObject {
             val result = JSONObject()
             result.put("uri", uri!!.toString())
@@ -67,7 +66,6 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
             return result
         }
 
-        @Throws(JSONException::class)
         private fun readFromJSONObject(json: JSONObject) {
             uri = Uri.parse(json.getString("uri"))
             description = json.getString("desc")
@@ -129,10 +127,10 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
         }
     }
 
-    private var _CacheMetadata: CacheMetadata? = null
-    private val _Context: WeakReference<Context> = WeakReference(context)
+    private var cacheMetadata: CacheMetadata? = null
+    private val context: WeakReference<Context> = WeakReference(context)
 
-    private val _ImageDownloader: ImageDownloader = ImageDownloader(context, this)
+    private val _ImageDownloader: ImageDownloader = ImageDownloader(context, this::downloadFinished)
 
     init {
         loadMetadata()
@@ -150,7 +148,7 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
 
     private val missingImageUris: List<Uri>
         get() {
-            val missingUris = _CacheMetadata!!.entries!!
+            val missingUris = cacheMetadata!!.entries!!
                     .filterNot { hasImage(it.uri!!) }
                     .map { it.uri!! }
             return missingUris
@@ -158,21 +156,21 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
 
 
     var metadata: CacheMetadata?
-        get() = _CacheMetadata
+        get() = cacheMetadata
         set(cacheMetadata) {
-            _CacheMetadata = cacheMetadata
+            this.cacheMetadata = cacheMetadata
             saveMetadata()
             cleanUpFiles()
         }
 
     private fun saveMetadata() {
         val metadataFile = File(cacheDirectory, METADATA_FILE_NAME)
-        if (_CacheMetadata == null && metadataFile.exists())
+        if (cacheMetadata == null && metadataFile.exists())
             metadataFile.delete()
-        if (_CacheMetadata == null)
+        if (cacheMetadata == null)
             return
         try {
-            FileUtils.writeTextFile(metadataFile, _CacheMetadata!!.toJSONObject().toString())
+            FileUtils.writeTextFile(metadataFile, cacheMetadata!!.toJSONObject().toString())
         } catch (e: IOException) {
         } catch (e: JSONException) {
         }
@@ -184,10 +182,10 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
      * (all files that are no longer referenced by the cache)
      */
     private fun cleanUpFiles() {
-        if (_CacheMetadata == null)
+        if (cacheMetadata == null)
             return
         val requiredFiles = ArrayList<String>()
-        _CacheMetadata!!.entries!!
+        cacheMetadata!!.entries!!
                 .map { getFileNameFromUri(it.uri!!) }
                 .filterNot { requiredFiles.contains(it) }
                 .forEach { requiredFiles.add(it) }
@@ -206,13 +204,13 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
      * loads a serialized copy of the metadata from the storage
      */
     private fun loadMetadata() {
-        _CacheMetadata = null
+        cacheMetadata = null
         val metadataFile = File(cacheDirectory, METADATA_FILE_NAME)
         if (metadataFile.exists()) {
             try {
                 val jsonString = FileUtils.readTextFile(metadataFile)
                 val jsonObject = JSONTokener(jsonString).nextValue() as JSONObject
-                _CacheMetadata = CacheMetadata.fromJSONObject(jsonObject)
+                cacheMetadata = CacheMetadata.fromJSONObject(jsonObject)
             } catch (e: JSONException) {
             } catch (e: IOException) {
             }
@@ -222,7 +220,7 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
 
     private val cacheDirectory: File?
         get() {
-            val context = _Context.get() ?: return null
+            val context = context.get() ?: return null
 
             return CacheUtils.getCacheDirectory(context)
         }
@@ -234,7 +232,7 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
      * *
      * @param tag
      */
-    @Synchronized override fun downloadFinished(content: ByteArray?, tag: Any) {
+    private @Synchronized fun downloadFinished(content: ByteArray?, tag: Any) {
         if (content != null) {
             val uri = tag as Uri
             val fName = getFileNameFromUri(uri)
@@ -255,9 +253,9 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
     }
 
     @Synchronized fun hasImage(daysInThePast: Int): Boolean {
-        if (_CacheMetadata!!.entries!!.size <= daysInThePast)
+        if (cacheMetadata!!.entries!!.size <= daysInThePast)
             return false
-        return hasImage(_CacheMetadata!!.entries!![daysInThePast].uri!!)
+        return hasImage(cacheMetadata!!.entries!![daysInThePast].uri!!)
     }
 
     @Synchronized fun hasImage(uri: Uri): Boolean {
@@ -266,9 +264,9 @@ class BingImageCache(context: Context) : ImageDownloadRequest.OnDownloadFinished
     }
 
     @Synchronized fun getFileName(daysInThePast: Int): String? {
-        if (_CacheMetadata!!.entries!!.size <= daysInThePast)
+        if (cacheMetadata!!.entries!!.size <= daysInThePast)
             return null
-        return getFileNameFromUri(_CacheMetadata!!.entries!![daysInThePast].uri!!)
+        return getFileNameFromUri(cacheMetadata!!.entries!![daysInThePast].uri!!)
     }
 
     internal val ReservedChars = arrayOf('|', '\\', '?', '*', '<', '\"', '\'', '/', ':', '>')

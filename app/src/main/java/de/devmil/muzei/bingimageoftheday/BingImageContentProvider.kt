@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -25,7 +25,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.util.Calendar
 
-import de.devmil.muzei.bingimageofthedayartsource.cache.CacheUtils
+import de.devmil.muzei.bingimageoftheday.cache.CacheUtils
 
 /**
  * Created by devmil on 24.02.14.
@@ -72,21 +72,15 @@ class BingImageContentProvider : ContentProvider() {
 
     companion object {
 
-        val PROVIDER_NAME = "de.devmil.muzei.bingimageofthedayartsource.provider.BingImages"
+        val PROVIDER_NAME = "de.devmil.muzei.bingimageoftheday.provider.BingImages"
 
         val CONTENT_URI = Uri.parse("content://"
                 + PROVIDER_NAME + "/images")!!
 
         fun getContentUri(fileName: String, useSalt: Boolean): Uri {
-            return Uri.parse(CONTENT_URI.toString()
-                    + "/"
-                    + fileName
-                    + "/"
-                    + if (useSalt)
-                java.lang.Long.toString(Calendar.getInstance()
-                        .timeInMillis)
-            else
-                "")
+            val saltValue = if (useSalt) java.lang.Long.toString(Calendar.getInstance().timeInMillis) else ""
+
+            return Uri.parse("${CONTENT_URI.toString()}/$fileName/$saltValue")
         }
     }
 }

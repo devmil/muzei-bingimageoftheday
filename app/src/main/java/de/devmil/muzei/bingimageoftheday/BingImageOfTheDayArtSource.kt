@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.content.Context
 import android.content.Intent
@@ -24,9 +24,9 @@ import com.google.android.apps.muzei.api.Artwork
 import com.google.android.apps.muzei.api.MuzeiArtSource
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource
 import de.devmil.common.utils.LogUtil
-import de.devmil.muzei.bingimageofthedayartsource.cache.BingImageCache
-import de.devmil.muzei.bingimageofthedayartsource.events.RequestMarketSettingChangedEvent
-import de.devmil.muzei.bingimageofthedayartsource.events.RequestPortraitSettingChangedEvent
+import de.devmil.muzei.bingimageoftheday.cache.BingImageCache
+import de.devmil.muzei.bingimageoftheday.events.RequestMarketSettingChangedEvent
+import de.devmil.muzei.bingimageoftheday.events.RequestPortraitSettingChangedEvent
 import de.greenrobot.event.EventBus
 import java.text.SimpleDateFormat
 import java.util.*
@@ -319,8 +319,8 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
 
         private val SOURCE_NAME = "BingImageOfTheDayArtSource"
 
-        private val ACTION_REQUESTUPDATE = "de.devmil.muzei.bingimageofthedayartsource.ACTION_REQUESTUPDATE"
-        private val ACTION_ENSUREINITIALIZED = "de.devmil.muzei.bingimageofthedayartsource.ACTION_ENSURE_INITIALIZED"
+        private val ACTION_REQUESTUPDATE = "de.devmil.muzei.bingimageoftheday.ACTION_REQUESTUPDATE"
+        private val ACTION_ENSUREINITIALIZED = "de.devmil.muzei.bingimageoftheday.ACTION_ENSURE_INITIALIZED"
 
         private val FAST_RETRY_MINUTES = 15
 

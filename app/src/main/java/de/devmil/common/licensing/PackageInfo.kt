@@ -24,7 +24,7 @@ import de.devmil.common.utils.LogUtil.LOGW
 * Created by devmil on 18.04.14.
 */
 class PackageInfo private constructor(val name: String, val vendor: String, val licenseId: String, val url: String, val copyright: String, val iconName: String, licenseAccess: ILicenseAccess) {
-    val license: LicenseDefinition = licenseAccess.getLicense(licenseId)
+    val license: LicenseDefinition by lazy { licenseAccess.getLicense(licenseId) }
 
     companion object {
 

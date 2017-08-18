@@ -26,15 +26,11 @@ import java.io.InputStreamReader
 /**
 * Created by devmil on 18.04.14.
 */
-class LicenseManager(private val _Context: Context, private val _LicenseInfoFileId: Int) {
-    val licenseInfo: LicenseInfo?
-
-    init {
-        licenseInfo = loadLicenseInfo()
-    }
+class LicenseManager(private val _Context: Context, private val licenseInfoFileId: Int) {
+    val licenseInfo: LicenseInfo? by lazy { loadLicenseInfo() }
 
     private fun loadLicenseInfo(): LicenseInfo? {
-        val stream = _Context.resources.openRawResource(_LicenseInfoFileId)
+        val stream = _Context.resources.openRawResource(licenseInfoFileId)
 
         val sr = InputStreamReader(stream)
         val br = BufferedReader(sr)

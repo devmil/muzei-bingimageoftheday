@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.net.Uri
 import java.text.ParseException

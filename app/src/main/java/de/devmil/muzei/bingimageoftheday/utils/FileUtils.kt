@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource.utils
+package de.devmil.muzei.bingimageoftheday.utils
 
 import java.io.BufferedReader
 import java.io.File
@@ -27,7 +27,6 @@ import java.io.OutputStreamWriter
 */
 object FileUtils {
 
-    @Throws(IOException::class)
     fun readTextFile(file: File): String {
         val result = StringBuilder()
         val br = BufferedReader(FileReader(file))
@@ -42,7 +41,6 @@ object FileUtils {
         return result.toString()
     }
 
-    @Throws(IOException::class)
     fun writeTextFile(file: File, content: String) {
         val sw = OutputStreamWriter(FileOutputStream(file))
         sw.write(content)

@@ -18,7 +18,7 @@ package de.devmil.common.utils
 
 import android.util.Log
 
-import de.devmil.muzei.bingimageofthedayartsource.BuildConfig
+import de.devmil.muzei.bingimageoftheday.BuildConfig
 
 
 /**

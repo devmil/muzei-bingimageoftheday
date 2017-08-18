@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -37,17 +37,17 @@ import de.devmil.common.utils.LogUtil
 
 class LicenseInfoActivity : Activity() {
 
-    private var _LicenseManager: LicenseManager? = null
+    private var licenseManager: LicenseManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_license_info)
 
-        _LicenseManager = LicenseManager(this, R.raw.licenseinfo)
+        licenseManager = LicenseManager(this, R.raw.licenseinfo)
 
         val listView = findViewById(R.id.activity_license_info_listView) as ListView
 
-        val adapter = LicenseEntryAdapter(this, _LicenseManager!!.licenseInfo!!.packages.toTypedArray())
+        val adapter = LicenseEntryAdapter(this, licenseManager!!.licenseInfo!!.packages.toTypedArray())
 
         listView.adapter = adapter
     }
@@ -89,7 +89,7 @@ class LicenseInfoActivity : Activity() {
 
             val item = getItem(position)
 
-            val drawableId = context.resources.getIdentifier(item!!.iconName, "drawable", "de.devmil.muzei.bingimageofthedayartsource")
+            val drawableId = context.resources.getIdentifier(item!!.iconName, "drawable", "de.devmil.muzei.bingimageoftheday")
 
             holder.image!!.setImageResource(drawableId)
             holder.name!!.text = item.name

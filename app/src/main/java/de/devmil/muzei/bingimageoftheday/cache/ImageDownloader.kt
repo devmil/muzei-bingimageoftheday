@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource.cache
+package de.devmil.muzei.bingimageoftheday.cache
 
 import android.content.Context
 import android.net.Uri
@@ -30,11 +30,10 @@ import de.devmil.common.utils.LogUtil
  * Handles the sequential download of a set of Uris pointing to images.
  * Fires an event each time an image has been downloaded
  */
-class ImageDownloader(private val _Context: Context, listener: ImageDownloadRequest.OnDownloadFinishedListener) : ImageDownloadRequest.OnDownloadFinishedListener {
+class ImageDownloader(private val _Context: Context, private val onFinished: (content: ByteArray?, tag: Any) -> Unit) {
 
     private var _ActiveUris: Queue<Uri>? = null
     private var _Request: ImageDownloadRequest? = null
-    private val _Listener: WeakReference<ImageDownloadRequest.OnDownloadFinishedListener> = WeakReference(listener)
 
     @Synchronized fun download(uris: List<Uri>) {
         if (_Request != null) {
@@ -60,18 +59,17 @@ class ImageDownloader(private val _Context: Context, listener: ImageDownloadRequ
             return
         }
         val uri = _ActiveUris!!.peek()
-        _Request = ImageDownloadRequest(this, uri)
+        _Request = ImageDownloadRequest(this::downloadFinished, uri)
         LogUtil.LOGD(TAG, String.format("starting download of %s", uri))
         _Request!!.download(_Context, uri)
     }
 
-    @Synchronized override fun downloadFinished(content: ByteArray?, tag: Any) {
+    private @Synchronized fun downloadFinished(content: ByteArray?, tag: Any) {
         val uri = tag as Uri
         LogUtil.LOGD(TAG, String.format("download finished: %s", uri))
         if (content != null) {
             LogUtil.LOGD(TAG, "passing downloaded image to the listener and proceeding")
-            val listener = _Listener.get()
-            listener?.downloadFinished(content, tag)
+            onFinished(content, tag)
             _ActiveUris!!.poll()
             processNextQueueItem()
         } else {

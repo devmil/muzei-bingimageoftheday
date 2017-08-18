@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource.cache
+package de.devmil.muzei.bingimageoftheday.cache
 
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.NetworkResponse

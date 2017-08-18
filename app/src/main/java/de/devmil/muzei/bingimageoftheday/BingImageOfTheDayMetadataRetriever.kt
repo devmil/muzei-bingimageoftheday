@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.net.Uri
 import android.util.Log
@@ -27,7 +27,7 @@ import retrofit.RestAdapter
 
  * Uses the Bing REST API to get the metadata for the current (and the last few) images of the day
  */
-class BingImageOfTheDayMetadataRetriever(private val _Market: BingMarket, private val _Dimension: BingImageDimension, private val _Portrait: Boolean) {
+class BingImageOfTheDayMetadataRetriever(private val market: BingMarket, private val dimension: BingImageDimension, private val portrait: Boolean) {
 
     val bingImageOfTheDayMetadata: List<BingImageMetadata>?
         get() {
@@ -37,7 +37,7 @@ class BingImageOfTheDayMetadataRetriever(private val _Market: BingMarket, privat
 
             try {
                 val service = restAdapter.create(IBingImageService::class.java)
-                val response = service.getImageOfTheDayMetadata(MAXIMUM_BING_IMAGE_NUMBER, _Market.marketCode)
+                val response = service.getImageOfTheDayMetadata(MAXIMUM_BING_IMAGE_NUMBER, market.marketCode)
 
                 if (response.images == null)
                     return null
@@ -53,7 +53,7 @@ class BingImageOfTheDayMetadataRetriever(private val _Market: BingMarket, privat
     private fun getMetadata(bingImages: List<IBingImageService.BingImage>): List<BingImageMetadata> {
         val result = ArrayList<BingImageMetadata>()
         for (bingImage in bingImages) {
-            val uri = Uri.parse(BING_URL + bingImage.urlbase + "_" + _Dimension.getStringRepresentation(_Portrait) + ".jpg")
+            val uri = Uri.parse(BING_URL + bingImage.urlbase + "_" + dimension.getStringRepresentation(portrait) + ".jpg")
 
             result.add(BingImageMetadata(uri, bingImage.copyright!!, bingImage.fullstartdate!!))
         }

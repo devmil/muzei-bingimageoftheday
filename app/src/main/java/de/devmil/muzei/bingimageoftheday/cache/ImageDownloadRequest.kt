@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource.cache
+package de.devmil.muzei.bingimageoftheday.cache
 
 import android.content.Context
 import android.net.Uri
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
-import java.lang.ref.WeakReference
 
 /**
 * Created by devmil on 24.02.14.
 */
-class ImageDownloadRequest(listener: ImageDownloadRequest.OnDownloadFinishedListener, private val _Tag: Any) {
+class ImageDownloadRequest(private val onFinished: (content: ByteArray?, tag: Any) -> Unit, private val _Tag: Any) {
 
-    private val _Listener: WeakReference<OnDownloadFinishedListener> = WeakReference(listener)
     var numberOfRetries: Int = 0
         private set
-    private var _Dead = false
-    private var _Queue: RequestQueue? = null
-    private var _DownloadingUri: String? = null
+    private var dead = false
+    private var queue: RequestQueue? = null
+    private var downloadingUri: String? = null
 
     init {
         numberOfRetries = 0
@@ -41,38 +39,31 @@ class ImageDownloadRequest(listener: ImageDownloadRequest.OnDownloadFinishedList
 
     @Synchronized fun download(context: Context, uri: Uri) {
         numberOfRetries++
-        _Dead = false
-        _DownloadingUri = uri.toString()
-        if (_Queue == null)
-            _Queue = Volley.newRequestQueue(context)
+        dead = false
+        downloadingUri = uri.toString()
+        if (queue == null)
+            queue = Volley.newRequestQueue(context)
         val listener = Response.Listener<ByteArray> { response ->
-            if (_Dead)
+            if (dead)
                 return@Listener
-            val listener = _Listener.get()
-            listener?.downloadFinished(response, _Tag)
+            onFinished(response, _Tag)
         }
         val errorListener = Response.ErrorListener {
-            if (_Dead)
+            if (dead)
                 return@ErrorListener
-            val rawListener = _Listener.get()
-            rawListener?.downloadFinished(null, _Tag)
+            onFinished(null, _Tag)
         }
         val fileRequest = FileRequest(
                 uri.toString(),
                 listener,
                 errorListener
         )
-        fileRequest.tag = _DownloadingUri
-        _Queue!!.add(fileRequest)
+        fileRequest.tag = downloadingUri
+        queue?.add(fileRequest)
     }
 
     @Synchronized fun cancel() {
-        _Dead = true
-        if (_Queue != null)
-            _Queue!!.cancelAll(_DownloadingUri!!)
-    }
-
-    interface OnDownloadFinishedListener {
-        fun downloadFinished(content: ByteArray?, tag: Any)
+        dead = true
+        queue?.cancelAll(downloadingUri)
     }
 }

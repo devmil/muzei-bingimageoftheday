@@ -1,4 +1,4 @@
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,17 +7,17 @@ import android.content.res.Configuration
 /**
 * Created by michaellamers on 05.05.15.
 */
-class Settings(private val _Context: Context, private val _Preferences: SharedPreferences) {
+class Settings(private val context: Context, private val preferences: SharedPreferences) {
 
     @Suppress("DEPRECATION")
             // Try find best match based on local
     // no best match? Default!
     var bingMarket: BingMarket
         get() {
-            var marketCode = _Preferences.getString(PREF_MARKET_CODE, null)
+            var marketCode = preferences.getString(PREF_MARKET_CODE, null)
 
             if (marketCode == null) {
-                val currentLocale = _Context.resources.configuration.locale
+                val currentLocale = context.resources.configuration.locale
                 if (currentLocale != null) {
                     val isoCode = currentLocale.toString().replace("_", "-")
                     val market = BingMarket.fromMarketCode(isoCode)
@@ -32,37 +32,37 @@ class Settings(private val _Context: Context, private val _Preferences: SharedPr
             return BingMarket.fromMarketCode(marketCode)
         }
         set(bingMarket) {
-            _Preferences.edit().putString(PREF_MARKET_CODE, bingMarket.marketCode).apply()
+            preferences.edit().putString(PREF_MARKET_CODE, bingMarket.marketCode).apply()
         }
 
     var currentBingMarket: BingMarket
-        get() = BingMarket.fromMarketCode(_Preferences.getString(PREF_CURRENT_MARKET, BingMarket.Unknown.marketCode)!!)
+        get() = BingMarket.fromMarketCode(preferences.getString(PREF_CURRENT_MARKET, BingMarket.Unknown.marketCode)!!)
         set(currentBingMarket) {
-            _Preferences
+            preferences
                     .edit()
                     .putString(PREF_CURRENT_MARKET, currentBingMarket.marketCode)
                     .apply()
         }
 
     var isOrientationPortrait: Boolean
-        get() = _Preferences.getBoolean(PREF_ORIENTATION_PORTRAIT, isPortraitDefault(_Context))
+        get() = preferences.getBoolean(PREF_ORIENTATION_PORTRAIT, isPortraitDefault(context))
         set(isOrientationPortrait) {
-            _Preferences.edit().putBoolean(PREF_ORIENTATION_PORTRAIT, isOrientationPortrait).apply()
+            preferences.edit().putBoolean(PREF_ORIENTATION_PORTRAIT, isOrientationPortrait).apply()
         }
 
     var isCurrentOrientationPortrait: Boolean
-        get() = _Preferences.getBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, isOrientationPortrait)
+        get() = preferences.getBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, isOrientationPortrait)
         set(isCurrentOrientationPortrait) {
-            _Preferences
+            preferences
                     .edit()
                     .putBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, isCurrentOrientationPortrait)
                     .apply()
         }
 
     var currentImageNumber: Int
-        get() = _Preferences.getInt(PREF_CURRENT_IMAGE_NUM, 0)
+        get() = preferences.getInt(PREF_CURRENT_IMAGE_NUM, 0)
         set(currentImageNumber) {
-            _Preferences
+            preferences
                     .edit()
                     .putInt(PREF_CURRENT_IMAGE_NUM, currentImageNumber)
                     .apply()

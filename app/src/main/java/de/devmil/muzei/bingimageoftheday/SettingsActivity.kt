@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -35,8 +35,8 @@ import android.widget.RadioButton
 import android.widget.Spinner
 import android.widget.TextView
 
-import de.devmil.muzei.bingimageofthedayartsource.events.RequestMarketSettingChangedEvent
-import de.devmil.muzei.bingimageofthedayartsource.events.RequestPortraitSettingChangedEvent
+import de.devmil.muzei.bingimageoftheday.events.RequestMarketSettingChangedEvent
+import de.devmil.muzei.bingimageoftheday.events.RequestPortraitSettingChangedEvent
 import de.greenrobot.event.EventBus
 
 class SettingsActivity : Activity() {

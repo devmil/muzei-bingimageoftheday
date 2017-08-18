@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.devmil.muzei.bingimageofthedayartsource
+package de.devmil.muzei.bingimageoftheday
 
 import java.util.ArrayList
 import java.util.Arrays
@@ -25,7 +25,7 @@ import java.util.Arrays
  * It contains the market code (used by Bing), a name (for selection in the UI) and
  * a drawable resource containing the flag
  */
-enum class BingMarket private constructor(val marketCode: String, private val _MarketName: String, val logoResourceId: Int) {
+enum class BingMarket private constructor(val marketCode: String, private val marketName: String, val logoResourceId: Int) {
     Unknown("", "Random", R.drawable.unknown),
     AR_XA("ar-XA", "Arabic – Arabia", R.drawable.united_arab_emirates),
     BG_BG("bg-BG", "Bulgarian – Bulgaria", R.drawable.bulgaria),
@@ -87,81 +87,17 @@ enum class BingMarket private constructor(val marketCode: String, private val _M
     ZH_TW("zh-TW", "Chinese – Taiwan", R.drawable.taiwan);
 
     override fun toString(): String {
-        return _MarketName
+        return marketName
     }
 
     companion object {
 
         fun fromMarketCode(marketCode: String): BingMarket {
-            if (Unknown.marketCode == marketCode)
-                return Unknown
-            if (AR_XA.marketCode == marketCode) return AR_XA
-            if (BG_BG.marketCode == marketCode) return BG_BG
-            if (CS_CZ.marketCode == marketCode) return CS_CZ
-            if (DA_DK.marketCode == marketCode) return DA_DK
-            if (DE_AT.marketCode == marketCode) return DE_AT
-            if (DE_CH.marketCode == marketCode) return DE_CH
-            if (DE_DE.marketCode == marketCode) return DE_DE
-            if (EL_GR.marketCode == marketCode) return EL_GR
-            if (EN_AU.marketCode == marketCode) return EN_AU
-            if (EN_CA.marketCode == marketCode) return EN_CA
-            if (EN_GB.marketCode == marketCode) return EN_GB
-            if (EN_ID.marketCode == marketCode) return EN_ID
-            if (EN_IE.marketCode == marketCode) return EN_IE
-            if (EN_IN.marketCode == marketCode) return EN_IN
-            if (EN_MY.marketCode == marketCode) return EN_MY
-            if (EN_NZ.marketCode == marketCode) return EN_NZ
-            if (EN_PH.marketCode == marketCode) return EN_PH
-            if (EN_SG.marketCode == marketCode) return EN_SG
-            if (EN_US.marketCode == marketCode) return EN_US
-            if (EN_XA.marketCode == marketCode) return EN_XA
-            if (EN_ZA.marketCode == marketCode) return EN_ZA
-            if (ES_AR.marketCode == marketCode) return ES_AR
-            if (ES_CL.marketCode == marketCode) return ES_CL
-            if (ES_ES.marketCode == marketCode) return ES_ES
-            if (ES_MX.marketCode == marketCode) return ES_MX
-            if (ES_US.marketCode == marketCode) return ES_US
-            if (ES_XL.marketCode == marketCode) return ES_XL
-            if (ET_EE.marketCode == marketCode) return ET_EE
-            if (FI_FI.marketCode == marketCode) return FI_FI
-            if (FR_BE.marketCode == marketCode) return FR_BE
-            if (FR_CA.marketCode == marketCode) return FR_CA
-            if (FR_CH.marketCode == marketCode) return FR_CH
-            if (FR_FR.marketCode == marketCode) return FR_FR
-            if (HE_IL.marketCode == marketCode) return HE_IL
-            if (HR_HR.marketCode == marketCode) return HR_HR
-            if (HU_HU.marketCode == marketCode) return HU_HU
-            if (IT_IT.marketCode == marketCode) return IT_IT
-            if (JA_JP.marketCode == marketCode) return JA_JP
-            if (KO_KR.marketCode == marketCode) return KO_KR
-            if (LT_LT.marketCode == marketCode) return LT_LT
-            if (LV_LV.marketCode == marketCode) return LV_LV
-            if (NB_NO.marketCode == marketCode) return NB_NO
-            if (NL_BE.marketCode == marketCode) return NL_BE
-            if (NL_NL.marketCode == marketCode) return NL_NL
-            if (PL_PL.marketCode == marketCode) return PL_PL
-            if (PT_BR.marketCode == marketCode) return PT_BR
-            if (PT_PT.marketCode == marketCode) return PT_PT
-            if (RO_RO.marketCode == marketCode) return RO_RO
-            if (RU_RU.marketCode == marketCode) return RU_RU
-            if (SK_SK.marketCode == marketCode) return SK_SK
-            if (SL_SL.marketCode == marketCode) return SL_SL
-            if (SV_SE.marketCode == marketCode) return SV_SE
-            if (TH_TH.marketCode == marketCode) return TH_TH
-            if (TR_TR.marketCode == marketCode) return TR_TR
-            if (UK_UA.marketCode == marketCode) return UK_UA
-            if (ZH_CN.marketCode == marketCode) return ZH_CN
-            if (ZH_HK.marketCode == marketCode) return ZH_HK
-            if (ZH_TW.marketCode == marketCode) return ZH_TW
-            return Unknown
+            return values().firstOrNull { it.marketCode == marketCode } ?: Unknown
         }
 
         fun selectableValues(): Array<BingMarket> {
-            val allValues = values()
-            val result = ArrayList<BingMarket>()
-            result.addAll(Arrays.asList(*allValues))
-            result.removeAt(0) //remove Random
-            return result.toTypedArray()
+            return values().copyOfRange(1, values().size - 1);
         }
     }
 

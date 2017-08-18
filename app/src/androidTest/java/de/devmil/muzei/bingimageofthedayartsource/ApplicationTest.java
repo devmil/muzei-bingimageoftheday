@@ -1,4 +1,4 @@
-package de.devmil.muzei.bingimageofthedayartsource;
+package de.devmil.muzei.bingimageoftheday;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
