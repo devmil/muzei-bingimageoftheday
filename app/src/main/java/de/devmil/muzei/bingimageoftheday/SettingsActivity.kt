@@ -128,7 +128,7 @@ class SettingsActivity : Activity() {
 
             val marketCode = settings.bingMarket.marketCode
 
-            return (0..marketAdapter!!.count - 1)
+            return (0 until marketAdapter!!.count)
                         .firstOrNull { marketAdapter!!.getItem(it)!!.marketCode == marketCode }
                     ?: 0
         }
