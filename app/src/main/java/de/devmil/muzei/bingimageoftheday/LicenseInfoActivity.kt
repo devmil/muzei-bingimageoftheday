@@ -89,7 +89,8 @@ class LicenseInfoActivity : Activity() {
 
             val item = getItem(position)
 
-            val drawableId = context.resources.getIdentifier(item!!.iconName, "drawable", "de.devmil.muzei.bingimageoftheday")
+            //context.getResources().getIdentifier() doesn't work any more!?
+            val drawableId = R.drawable::class.java.getField(item!!.iconName).getInt(null)
 
             holder.image!!.setImageResource(drawableId)
             holder.name!!.text = item.name
