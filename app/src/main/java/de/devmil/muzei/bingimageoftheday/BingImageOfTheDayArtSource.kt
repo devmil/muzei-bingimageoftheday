@@ -23,6 +23,7 @@ import android.os.IBinder
 import com.google.android.apps.muzei.api.Artwork
 import com.google.android.apps.muzei.api.MuzeiArtSource
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource
+import com.google.android.apps.muzei.api.UserCommand
 import de.devmil.common.utils.LogUtil
 import de.devmil.muzei.bingimageoftheday.cache.BingImageCache
 import de.devmil.muzei.bingimageoftheday.events.RequestMarketSettingChangedEvent
@@ -37,6 +38,8 @@ import java.util.*
  */
 class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") {
 
+    private val COMMAND_ID_SHARE = MuzeiArtSource.MAX_CUSTOM_COMMAND_ID - 1
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val result = super.onStartCommand(intent, flags, startId)
         if (intent != null && (ACTION_REQUESTUPDATE == intent.action || ACTION_ENSUREINITIALIZED == intent.action))
@@ -50,7 +53,20 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
 
     override fun onCreate() {
         super.onCreate()
-        setUserCommands(MuzeiArtSource.BUILTIN_COMMAND_ID_NEXT_ARTWORK)
+        setUserCommands(UserCommand(MuzeiArtSource.BUILTIN_COMMAND_ID_NEXT_ARTWORK),
+                UserCommand(COMMAND_ID_SHARE, getString(R.string.command_title_share)))
+    }
+
+    override fun onCustomCommand(id: Int) {
+        super.onCustomCommand(id)
+        val settings = Settings(this, MuzeiArtSource.getSharedPreferences(applicationContext, SOURCE_NAME))
+
+        if (_Cache == null)
+            _Cache = BingImageCache(applicationContext)
+
+        if(id == COMMAND_ID_SHARE) {
+            shareCurrentImage(settings);
+        }
     }
 
     @Throws(RemoteMuzeiArtSource.RetryException::class)
@@ -182,6 +198,23 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
                 requestNextImageUpdate(imageOnBingPresentThru.time)
         } else {
             throw RemoteMuzeiArtSource.RetryException()
+        }
+    }
+
+    private fun shareCurrentImage(settings: Settings) {
+        LogUtil.LOGD(TAG, String.format("got share request, current image: $settings.currentImageNumber"))
+        if (_Cache!!.hasImage(settings.currentImageNumber)) {
+            val uri = BingImageContentProvider.getContentUri(_Cache!!.getFileName(settings.currentImageNumber)!!, false)
+
+            LogUtil.LOGD(TAG, String.format("Share URI: $uri"))
+
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.type = "image/jpeg"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            startActivity(shareIntent)
         }
     }
 

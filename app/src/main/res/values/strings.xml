@@ -9,7 +9,8 @@
     <string name="fragment_settings_orientation_label">Orientation</string>
     <string name="fragment_settings_market_label">Market</string>
     <string name="fragment_settings_button_license_label">About</string>
-    <string name="copyright">© 2015 Devmil Solutions - Michael Lamers</string>
+    <string name="copyright">© 2017 Devmil Solutions - Michael Lamers</string>
     <string name="activity_license_info_license_info_headline">License Info</string>
     <string name="license_info_activity_label">About</string>
+    <string name="command_title_share">Share</string>
 </resources>

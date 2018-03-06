@@ -25,9 +25,15 @@
       <configuration version="2" platform="JVM 1.8" useProjectSettings="false">
         <compilerSettings />
         <compilerArguments>
+          <option name="destination" value="$MODULE_DIR$/build/tmp/kotlin-classes/debug" />
+          <option name="noStdlib" value="true" />
+          <option name="noReflect" value="true" />
+          <option name="moduleName" value="muzei_biot_debug" />
           <option name="jvmTarget" value="1.8" />
-          <option name="languageVersion" value="1.1" />
-          <option name="apiVersion" value="1.1" />
+          <option name="addCompilerBuiltIns" value="true" />
+          <option name="loadBuiltInsFromDependencies" value="true" />
+          <option name="languageVersion" value="1.2" />
+          <option name="apiVersion" value="1.2" />
           <option name="pluginOptions">
             <array />
           </option>
@@ -120,18 +126,17 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/kotlin" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/reports" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="de.greenrobot:eventbus:2.2.0@jar" level="project" />
-    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51@jar" level="project" />
     <orderEntry type="library" name="com.android.volley:volley-1.0.0" level="project" />
+    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.30@jar" level="project" />
+    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib:1.2.30@jar" level="project" />
     <orderEntry type="library" name="org.jetbrains:annotations:13.0@jar" level="project" />
     <orderEntry type="library" name="com.google.android.apps.muzei:muzei-api:2.0@jar" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.2.4@jar" level="project" />
-    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib:1.1.51@jar" level="project" />
     <orderEntry type="library" name="com.squareup.retrofit:retrofit:1.3.0@jar" level="project" />
     <orderEntry type="library" name="android-android-25" level="project" />
   </component>
