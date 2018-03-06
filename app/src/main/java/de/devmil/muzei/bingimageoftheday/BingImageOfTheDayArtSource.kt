@@ -53,8 +53,9 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
 
     override fun onCreate() {
         super.onCreate()
-        setUserCommands(UserCommand(MuzeiArtSource.BUILTIN_COMMAND_ID_NEXT_ARTWORK),
-                UserCommand(COMMAND_ID_SHARE, getString(R.string.command_title_share)))
+        setUserCommands(
+                UserCommand(MuzeiArtSource.BUILTIN_COMMAND_ID_NEXT_ARTWORK),
+                UserCommand(COMMAND_ID_SHARE, getString(R.string.command_share_title)))
     }
 
     override fun onCustomCommand(id: Int) {
@@ -204,15 +205,19 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
     private fun shareCurrentImage(settings: Settings) {
         LogUtil.LOGD(TAG, String.format("got share request, current image: $settings.currentImageNumber"))
         if (_Cache!!.hasImage(settings.currentImageNumber)) {
+            val entry = _Cache!!.metadata!!.entries!![settings.currentImageNumber]
             val uri = BingImageContentProvider.getContentUri(_Cache!!.getFileName(settings.currentImageNumber)!!, false)
 
             LogUtil.LOGD(TAG, String.format("Share URI: $uri"))
 
-            val shareIntent = Intent()
+            var shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
-            shareIntent.type = "image/jpeg"
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.command_share_message, entry.copyright))
+            shareIntent.type = "image/jpg"
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            shareIntent = Intent.createChooser(shareIntent, getString(R.string.command_share_title))
 
             startActivity(shareIntent)
         }
