@@ -15,16 +15,30 @@
  */
 package de.devmil.muzei.bingimageoftheday
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import de.devmil.common.utils.LogUtil
 
-/**
- * This class ensures that the BingImageOfTheDayArtSource is up and running after the device got booted
- */
-class BootReceiver : BroadcastReceiver() {
+class UpdateReceiver : BroadcastReceiver() {
 
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
-        BingImageOfTheDayArtSource.ensureInitialized(context)
+        LogUtil.LOGD(TAG, "received update")
+
+        if(BingImageOfTheDayArtProvider.isActive ?: false) {
+            LogUtil.LOGD(TAG, "Updating provider")
+            BingImageOfTheDayArtProvider.doUpdate()
+        }
+
+        if(!(BingImageOfTheDayArtProvider.isActive ?: true)) {
+            LogUtil.LOGD(TAG, "Updating art source")
+            BingImageOfTheDayArtSource.ensureInitialized(context)
+        }
+    }
+
+    companion object {
+        private const val TAG = "UpdateReceiver"
     }
 }
