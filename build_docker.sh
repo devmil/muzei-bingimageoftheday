@@ -9,4 +9,4 @@ docker run --rm \
     -v "$PWD":/home/gradle/ \
     -w /home/gradle \
     muzei-bingimageoftheday \
-    gradle build
+    $(mkdir Key) && $(touch Key/keystore.properties) && $(gradle build)
