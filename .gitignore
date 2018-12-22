@@ -34,3 +34,5 @@ Key/*
 Thumbs.db
 
 .android
+
+/gradle/
