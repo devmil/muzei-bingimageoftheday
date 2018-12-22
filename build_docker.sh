@@ -6,7 +6,7 @@ docker build \
     .
 
 docker run --rm \
-    -v "$PWD":/home/gradle/ \
-    -w /home/gradle \
+    -v "$PWD":/home/app \
+    -w /home/app \
     muzei-bingimageoftheday \
-    gradle build
+    bash .ci/build.sh
