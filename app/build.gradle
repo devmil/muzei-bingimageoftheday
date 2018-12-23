@@ -72,7 +72,7 @@ repositories {
 }
 
 def buildTime() {
-    return new Date().format("yyyyMMdd_HH_mm")
+    return new Date().format("yyyyMMdd")
 }
 
 buildscript {
