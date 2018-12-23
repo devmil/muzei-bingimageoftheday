@@ -12,6 +12,8 @@ android {
         versionCode 7
         versionName "1.6"
 
+        archivesBaseName = "muzei_biot-v${defaultConfig.versionName}-${buildTime()}"
+
         def bingImageOfTheDayAuthorityValue = "de.devmil.muzei.bingimageoftheday.provider.BingImageOfTheDayArtSource"
         manifestPlaceholders = [bingImageOfTheDayAuthority: bingImageOfTheDayAuthorityValue]
         buildConfigField "String", "BING_IMAGE_OF_THE_DAY_AUTHORITY", "\"${bingImageOfTheDayAuthorityValue}\""
@@ -21,12 +23,15 @@ android {
         release {
             def propertiesFile = file('../Key/keystore.properties')
             if(propertiesFile.exists()) {
+                println "Keystore properties found! Building signed..."
                 def Properties keyProps = new Properties()
                 keyProps.load(new FileInputStream(propertiesFile))
                 storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
                 keyAlias keyProps["alias"]
                 storePassword keyProps["storePass"]
                 keyPassword keyProps["pass"]
+            } else {
+                println "No Keystore properties found! Building unsigned..."
             }
         }
     }
@@ -52,8 +57,6 @@ android {
     }
 }
 
-project.archivesBaseName = "muzei_biot"
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation 'com.google.android.apps.muzei:muzei-api:3.0.0-beta02'
@@ -67,5 +70,10 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+def buildTime() {
+    return new Date().format("yyyyMMdd_HH_mm")
+}
+
 buildscript {
 }
