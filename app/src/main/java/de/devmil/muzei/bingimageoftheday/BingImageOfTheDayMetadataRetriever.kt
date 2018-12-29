@@ -64,7 +64,7 @@ class BingImageOfTheDayMetadataRetriever(private val market: BingMarket, private
 
         private val TAG = BingImageOfTheDayMetadataRetriever::class.java.name
 
-        private val BING_URL = "http://www.bing.com"
+        private val BING_URL = "https://www.bing.com"
 
         val MAXIMUM_BING_IMAGE_NUMBER = 8
     }
