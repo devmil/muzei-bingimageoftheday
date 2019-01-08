@@ -2,24 +2,37 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "de.devmil.muzei.bingimageofthedayartsource"
-        minSdkVersion 17
-        targetSdkVersion 25
-        versionCode 6
-        versionName "1.5"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 7
+        versionName "1.6"
+
+        archivesBaseName = "muzei_biot-v${defaultConfig.versionName}-${buildTime()}"
+
+        def bingImageOfTheDayAuthorityValue = "de.devmil.muzei.bingimageoftheday.provider.BingImageOfTheDayArtSource"
+        manifestPlaceholders = [bingImageOfTheDayAuthority: bingImageOfTheDayAuthorityValue]
+        buildConfigField "String", "BING_IMAGE_OF_THE_DAY_AUTHORITY", "\"${bingImageOfTheDayAuthorityValue}\""
+
     }
     signingConfigs {
         release {
-            def Properties keyProps = new Properties()
-            keyProps.load(new FileInputStream(file('../Key/keystore.properties')))
-            storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
-            keyAlias keyProps["alias"]
-            storePassword keyProps["storePass"]
-            keyPassword keyProps["pass"]
+            def propertiesFile = file('../Key/keystore.properties')
+            if(propertiesFile.exists()) {
+                println "Keystore properties found! Building signed..."
+                def Properties keyProps = new Properties()
+                keyProps.load(new FileInputStream(propertiesFile))
+                storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
+                keyAlias keyProps["alias"]
+                storePassword keyProps["storePass"]
+                keyPassword keyProps["pass"]
+            } else {
+                println "No Keystore properties found! Building unsigned..."
+            }
         }
     }
     buildTypes {
@@ -32,7 +45,10 @@ android {
             minifyEnabled false //EventBus seems not to work using the current config
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            def propertiesFile = file('../Key/keystore.properties')
+            if(propertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
@@ -41,18 +57,23 @@ android {
     }
 }
 
-project.archivesBaseName = "muzei_biot"
-
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    compile 'com.google.android.apps.muzei:muzei-api:2.0'
-    compile 'com.squareup.retrofit:retrofit:1.3.0'
-    compile 'de.greenrobot:eventbus:2.2.0'
-    compile 'com.android.volley:volley:1.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation 'com.google.android.apps.muzei:muzei-api:3.0.0-beta02'
+    implementation "androidx.core:core-ktx:$rootProject.ext.ktxVersion"
+    implementation "android.arch.work:work-runtime-ktx:$rootProject.ext.workManagerVersion"
+    implementation 'com.squareup.retrofit:retrofit:1.3.0'
+    implementation 'de.greenrobot:eventbus:2.2.0'
+    implementation 'com.android.volley:volley:1.1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 repositories {
     mavenCentral()
 }
+
+def buildTime() {
+    return new Date().format("yyyyMMdd")
+}
+
 buildscript {
 }

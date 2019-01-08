@@ -32,3 +32,8 @@ Key/*
 /.project
 
 Thumbs.db
+
+.android
+
+/gradle/
+/gradlew*

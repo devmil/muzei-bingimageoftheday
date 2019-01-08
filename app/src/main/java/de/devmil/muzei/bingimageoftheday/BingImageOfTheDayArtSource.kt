@@ -159,9 +159,7 @@ class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") 
             imageOnBingPresentThru.add(Calendar.DAY_OF_MONTH, -1 * imageNumberToUse)
 
             val imgToken = createToken(imageOnBingPresentThru.time, market, requestPortraitMode)
-            var currentToken = ""
-            if (currentArtwork != null)
-                currentToken = currentArtwork.token
+            val currentToken = currentArtwork?.token ?: ""
 
             settings.currentImageNumber = imageNumberToUse
             settings.currentBingMarket = market

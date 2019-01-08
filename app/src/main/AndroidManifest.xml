@@ -41,6 +41,9 @@
             <meta-data
                 android:name="color"
                 android:value="#ace5cc" />
+            <meta-data
+                android:name="replacement"
+                android:value="de.devmil.muzei.bingimageoftheday.BingImageContentProvider"/>
         </service>
 
         <provider
@@ -49,8 +52,23 @@
             android:exported="true" >
         </provider>
 
+        <provider
+            android:name="de.devmil.muzei.bingimageoftheday.BingImageOfTheDayArtProvider"
+            android:authorities="${bingImageOfTheDayAuthority}"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:description="@string/source_description"
+            android:permission="com.google.android.apps.muzei.api.ACCESS_PROVIDER">
+            <intent-filter>
+                <action android:name="com.google.android.apps.muzei.api.MuzeiArtProvider"/>
+            </intent-filter>
+            <meta-data
+                android:name="settingsActivity"
+                android:value="de.devmil.muzei.bingimageoftheday.SettingsActivity" />
+        </provider>
+
         <receiver
-            android:name="de.devmil.muzei.bingimageoftheday.BootReceiver"
+            android:name="de.devmil.muzei.bingimageoftheday.UpdateReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
