@@ -25,3 +25,6 @@ ENV PATH ${PATH}:${ANDROID_HOME}/tools/bin
 
 RUN yes | sdkmanager --licenses \
 	&& sdkmanager "platforms;android-27" "platform-tools" "extras;google;m2repository" "build-tools;27.0.3" --verbose
+
+# bash_r is a wrapper for bash that removes \r
+ADD bash_r.tgz /bin
