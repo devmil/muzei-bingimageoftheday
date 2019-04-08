@@ -21,6 +21,7 @@ import android.util.Log
 import java.util.ArrayList
 
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * Created by devmil on 16.02.14.
@@ -33,13 +34,14 @@ class BingImageOfTheDayMetadataRetriever(private val market: BingMarket, private
         get() {
             val restAdapter = Retrofit.Builder()
                     .baseUrl(BING_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
             try {
                 val service = restAdapter.create(IBingImageService::class.java)
-                val response = service.getImageOfTheDayMetadata(MAXIMUM_BING_IMAGE_NUMBER, market.marketCode)
+                val response = service.getImageOfTheDayMetadata(MAXIMUM_BING_IMAGE_NUMBER, market.marketCode).execute().body()
 
-                if (response.images == null)
+                if (response?.images == null)
                     return null
 
                 return getMetadata(response.images!!)

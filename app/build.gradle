@@ -65,6 +65,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$rootProject.ext.ktxVersion"
     implementation "android.arch.work:work-runtime-ktx:$rootProject.ext.workManagerVersion"
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'de.greenrobot:eventbus:2.2.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.squareup.picasso:picasso:2.5.2'

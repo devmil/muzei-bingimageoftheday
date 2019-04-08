@@ -15,6 +15,7 @@
  */
 package de.devmil.muzei.bingimageoftheday
 
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -26,7 +27,7 @@ import retrofit2.http.Query
 interface IBingImageService {
 
     @GET("/HPImageArchive.aspx?format=js&idx=0")
-    fun getImageOfTheDayMetadata(@Query("n") number: Int, @Query("mkt") market: String): BingImageResponse
+    fun getImageOfTheDayMetadata(@Query("n") number: Int, @Query("mkt") market: String): Call<BingImageResponse>
 
     class BingImageResponse {
         internal var images: List<BingImage>? = null
