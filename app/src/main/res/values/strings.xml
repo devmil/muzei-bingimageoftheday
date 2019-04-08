@@ -14,4 +14,5 @@
     <string name="license_info_activity_label">About</string>
     <string name="command_share_message">My current Android wallpaper: \'%1$s\'</string>
     <string name="command_share_title">Share current Bing image</string>
+    <string name="command_open_title">Open current Bing image URL</string>
 </resources>

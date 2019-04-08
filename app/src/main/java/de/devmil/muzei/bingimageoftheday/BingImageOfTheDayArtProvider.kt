@@ -2,6 +2,7 @@ package de.devmil.muzei.bingimageoftheday
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import com.google.android.apps.muzei.api.UserCommand
 import com.google.android.apps.muzei.api.provider.Artwork
@@ -41,6 +42,7 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
         private const val TAG = "BingImageOfTheDayArtPro"
 
         private val COMMAND_ID_SHARE = 2
+        private val COMMAND_ID_OPEN = 3
 
         private var CatcherInstance: BingImageOfTheDayArtProvider.EventCatcher? = null
 
@@ -65,6 +67,7 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
         val result = super.getCommands(artwork)
 
         result.add(UserCommand(COMMAND_ID_SHARE, context?.getString(R.string.command_share_title) ?: "Share"))
+        result.add(UserCommand(COMMAND_ID_OPEN, context?.getString(R.string.command_open_title) ?: "Open"))
 
         return result;
     }
@@ -72,7 +75,9 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
     override fun onCommand(artwork: Artwork, id: Int) {
         super.onCommand(artwork, id)
         if(id == COMMAND_ID_SHARE) {
-            shareCurrentImage();
+            shareCurrentImage()
+        } else if(id == COMMAND_ID_OPEN) {
+            openCurrentImage()
         }
     }
 
@@ -102,6 +107,20 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
             shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
             context?.startActivity(shareIntent)
+        }
+    }
+
+    private fun openCurrentImage() {
+        LogUtil.LOGD(TAG, "got open request")
+        lastAddedArtwork?.let {
+            var openIntent = Intent(Intent.ACTION_VIEW)
+
+            LogUtil.LOGD(TAG, "Opening ${it.webUri}")
+
+            openIntent.data = it.webUri
+            openIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+            context?.startActivity(openIntent)
         }
     }
 }
