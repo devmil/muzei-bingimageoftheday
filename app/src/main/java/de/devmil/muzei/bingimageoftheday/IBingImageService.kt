@@ -15,8 +15,8 @@
  */
 package de.devmil.muzei.bingimageoftheday
 
-import retrofit.http.GET
-import retrofit.http.Query
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 /**
  * Created by devmil on 18.02.14.

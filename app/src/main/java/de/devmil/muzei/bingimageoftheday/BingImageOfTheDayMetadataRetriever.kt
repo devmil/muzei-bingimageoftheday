@@ -20,7 +20,7 @@ import android.util.Log
 
 import java.util.ArrayList
 
-import retrofit.RestAdapter
+import retrofit2.Retrofit
 
 /**
  * Created by devmil on 16.02.14.
@@ -31,8 +31,8 @@ class BingImageOfTheDayMetadataRetriever(private val market: BingMarket, private
 
     val bingImageOfTheDayMetadata: List<BingImageMetadata>?
         get() {
-            val restAdapter = RestAdapter.Builder()
-                    .setServer(BING_URL)
+            val restAdapter = Retrofit.Builder()
+                    .baseUrl(BING_URL)
                     .build()
 
             try {
