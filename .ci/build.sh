@@ -38,6 +38,7 @@ if [ $cmdresult -eq 0 ]; then
     rm -rf $source_root/app/app/build
   fi
   cp -r $(pwd)/app/build $source_root/app/build
+  chown -R `stat -c "%u:%g" $(source_root)/app` $(source_root)/app/build
 fi
 
 # return the build result
