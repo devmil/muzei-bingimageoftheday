@@ -9,4 +9,4 @@ docker run --rm \
     -v "$PWD":/home/app \
     -w /home/app \
     muzei-bingimageoftheday \
-    bash .ci/build.sh
+    bash_r .ci/build.sh

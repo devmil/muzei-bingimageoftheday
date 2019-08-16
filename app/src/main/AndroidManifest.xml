@@ -53,6 +53,16 @@
         </provider>
 
         <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="de.devmil.muzei.bingimageoftheday.ImageFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <provider
             android:name="de.devmil.muzei.bingimageoftheday.BingImageOfTheDayArtProvider"
             android:authorities="${bingImageOfTheDayAuthority}"
             android:exported="true"

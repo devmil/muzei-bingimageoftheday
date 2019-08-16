@@ -37,3 +37,4 @@ Thumbs.db
 
 /gradle/
 /gradlew*
+local.properties.tmp

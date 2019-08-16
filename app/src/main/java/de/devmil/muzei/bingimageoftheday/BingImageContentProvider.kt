@@ -21,16 +21,14 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 
-import java.io.File
 import java.io.FileNotFoundException
-import java.util.Calendar
-
-import de.devmil.muzei.bingimageoftheday.cache.CacheUtils
 
 /**
  * Created by devmil on 24.02.14.
 
  * This content provider provides access to the cached images
+ *
+ * This is only left to have the "old" API in place
  */
 class BingImageContentProvider : ContentProvider() {
 
@@ -60,27 +58,6 @@ class BingImageContentProvider : ContentProvider() {
 
     @Throws(FileNotFoundException::class)
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
-        val fileName = uri.pathSegments[1]
-
-        val file = File(CacheUtils.getCacheDirectory(context), fileName)
-        if (!file.exists())
-            throw FileNotFoundException()
-
-        return ParcelFileDescriptor.open(file,
-                ParcelFileDescriptor.MODE_READ_ONLY)
-    }
-
-    companion object {
-
-        val PROVIDER_NAME = "de.devmil.muzei.bingimageoftheday.provider.BingImages"
-
-        val CONTENT_URI = Uri.parse("content://"
-                + PROVIDER_NAME + "/images")!!
-
-        fun getContentUri(fileName: String, useSalt: Boolean): Uri {
-            val saltValue = if (useSalt) java.lang.Long.toString(Calendar.getInstance().timeInMillis) else ""
-
-            return Uri.parse("${CONTENT_URI.toString()}/$fileName/$saltValue")
-        }
+        throw FileNotFoundException()
     }
 }
