@@ -1,34 +1,23 @@
 package de.devmil.muzei.bingimageoftheday
 
-import android.annotation.TargetApi
+import android.app.PendingIntent
+import android.content.ClipData
+import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.FileProvider
-import com.google.android.apps.muzei.api.UserCommand
+import androidx.core.app.RemoteActionCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.google.android.apps.muzei.api.provider.Artwork
 import com.google.android.apps.muzei.api.provider.MuzeiArtProvider
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import de.devmil.common.utils.LogUtil
 import de.devmil.muzei.bingimageoftheday.events.RequestMarketSettingChangedEvent
 import de.devmil.muzei.bingimageoftheday.events.RequestPortraitSettingChangedEvent
 import de.devmil.muzei.bingimageoftheday.worker.BingImageOfTheDayWorker
 import de.greenrobot.event.EventBus
 import java.io.InputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
 
 class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
 
@@ -58,7 +47,6 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
         private const val TAG = "BingImageOfTheDayArtPro"
 
         private val COMMAND_ID_SHARE = 2
-        private val COMMAND_ID_OPEN = 3
 
         private var CatcherInstance: BingImageOfTheDayArtProvider.EventCatcher? = null
 
@@ -79,21 +67,18 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
         }
     }
 
-    override fun getCommands(artwork: Artwork): MutableList<UserCommand> {
-        val result = super.getCommands(artwork)
+    /* kept for backward compatibility with Muzei 3.3 */
+    @Suppress("OverridingDeprecatedMember", "DEPRECATION")
+    override fun getCommands(artwork: Artwork) = listOf(
+            com.google.android.apps.muzei.api.UserCommand(COMMAND_ID_SHARE,
+                    context?.getString(R.string.command_share_title) ?: "Share"))
 
-        result.add(UserCommand(COMMAND_ID_SHARE, context?.getString(R.string.command_share_title) ?: "Share"))
-        result.add(UserCommand(COMMAND_ID_OPEN, context?.getString(R.string.command_open_title) ?: "Open"))
-
-        return result;
-    }
-
+    /* kept for backward compatibility with Muzei 3.3 */
+    @Suppress("OverridingDeprecatedMember")
     override fun onCommand(artwork: Artwork, id: Int) {
-        super.onCommand(artwork, id)
+        val context = context ?: return
         if(id == COMMAND_ID_SHARE) {
-            shareCurrentImage()
-        } else if(id == COMMAND_ID_OPEN) {
-            openCurrentImage()
+            shareCurrentImage(context, artwork)
         }
     }
 
@@ -104,90 +89,55 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
 
     override fun openFile(artwork: Artwork): InputStream {
         Log.d(TAG, "Loading artwork: ${artwork.title} (${artwork.persistentUri})")
-        return super.openFile(artwork);
+        return super.openFile(artwork)
     }
 
-    @TargetApi(26)
-    fun getLocalBitmapUri(bmp: Bitmap?, context: Context?): Uri? {
-        var bmpUri: Uri? = null
-        bmp?.let { bitmap ->
-            try {
-                context?.let { ctx ->
-                    val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-kkmmss"))
-                    val imagePath = File(context.cacheDir, "images")
-                    imagePath.mkdirs()
-                    val outputFile = File(imagePath, "output-$timestamp.png")
-                    val out = FileOutputStream(outputFile)
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, out)
-                    out.close()
-                    bmpUri = FileProvider.getUriForFile(context, "de.devmil.muzei.bingimageoftheday.ImageFileProvider", outputFile)
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Toast.makeText(context, "Error downloading the image to share", Toast.LENGTH_LONG).show()
-            }
-        }
-
-        return bmpUri
-    }
-
-    private fun shareCurrentImage() {
+    private fun createShareIntent(context: Context, artwork: Artwork): Intent {
         LogUtil.LOGD(TAG, "got share request")
-        lastAddedArtwork?.let {
-            var shareIntent = Intent()
-            shareIntent.action = Intent.ACTION_SEND
-            val shareMessage = context?.getString(R.string.command_share_message, it.byline)
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "$shareMessage - ${it.webUri.toString()}")
-            shareIntent.type = "text/plain"
-            //shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-            LogUtil.LOGD(TAG, "Sharing ${it.webUri}")
-
-            //For API > 26: download image and attach that
-            if(Build.VERSION.SDK_INT >= 26) {
-                val uiHandler = Handler(Looper.getMainLooper())
-                uiHandler.post {
-                    Picasso.with(context).load(it.webUri).into(object : Target {
-                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                            LogUtil.LOGD(TAG, "Downloading ${it.webUri}")
-                        }
-
-                        override fun onBitmapFailed(errorDrawable: Drawable?) {
-                            Toast.makeText(context, "Error downloading the image to share", Toast.LENGTH_LONG).show()
-                        }
-
-                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                            shareIntent.putExtra(Intent.EXTRA_STREAM, getLocalBitmapUri(bitmap, context))
-                            shareIntent.type = "image/png"
-
-                            executeIntentSharing(shareIntent)
-                        }
-                    })
-                }
-            } else { // SDK < 26 => directly share (the URL)
-                executeIntentSharing(shareIntent)
-            }
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            val shareMessage = context.getString(R.string.command_share_message, artwork.byline)
+            putExtra(Intent.EXTRA_TEXT, "$shareMessage - ${artwork.webUri.toString()}")
+            val contentUri = Uri.Builder()
+                    .scheme(ContentResolver.SCHEME_CONTENT)
+                    .authority("de.devmil.muzei.bingimageoftheday.provider.BingImages")
+                    .build()
+            val uri = ContentUris.withAppendedId(contentUri, artwork.id)
+            putExtra(Intent.EXTRA_TITLE, artwork.byline)
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = context.contentResolver.getType(uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            clipData = ClipData.newUri(context.contentResolver,
+                    artwork.byline, uri)
         }
+        return Intent.createChooser(shareIntent,
+                context.getString(R.string.command_share_title))
     }
 
-    private fun executeIntentSharing(intent: Intent) {
-        var shareIntent = Intent.createChooser(intent, context?.getString(R.string.command_share_title) ?: "")
+    private fun shareCurrentImage(context: Context, artwork: Artwork) {
+        LogUtil.LOGD(TAG, "Sharing ${artwork.webUri}")
+
+        val shareIntent = createShareIntent(context, artwork)
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        context?.startActivity(shareIntent)
+        context.startActivity(shareIntent)
     }
 
-    private fun openCurrentImage() {
-        LogUtil.LOGD(TAG, "got open request")
-        lastAddedArtwork?.let {
-            var openIntent = Intent(Intent.ACTION_VIEW)
+    /* Used by Muzei 3.4+ */
+    override fun getCommandActions(artwork: Artwork): List<RemoteActionCompat> {
+        val context = context ?: return super.getCommandActions(artwork)
+        return listOf(
+                RemoteActionCompat(
+                        IconCompat.createWithResource(context, R.drawable.ic_share),
+                        context.getString(R.string.command_share_title),
+                        context.getString(R.string.command_share_title),
+                        PendingIntent.getActivity(context, artwork.id.toInt(),
+                                createShareIntent(context, artwork),
+                                PendingIntent.FLAG_UPDATE_CURRENT))
+        )
+    }
 
-            LogUtil.LOGD(TAG, "Opening ${it.webUri}")
-
-            openIntent.data = it.webUri
-            openIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-            context?.startActivity(openIntent)
-        }
+    override fun getArtworkInfo(artwork: Artwork): PendingIntent? {
+        LogUtil.LOGD(TAG, "Opening ${artwork.webUri}")
+        return super.getArtworkInfo(artwork)
     }
 }

@@ -2,8 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "de.devmil.muzei.bingimageofthedayartsource"
@@ -61,15 +60,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'com.google.android.apps.muzei:muzei-api:3.0.0-beta02'
+    implementation 'com.google.android.apps.muzei:muzei-api:3.4.0'
     implementation "androidx.core:core-ktx:$rootProject.ext.ktxVersion"
-    implementation "android.arch.work:work-runtime-ktx:$rootProject.ext.workManagerVersion"
+    implementation "androidx.work:work-runtime-ktx:$rootProject.ext.workManagerVersion"
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'de.greenrobot:eventbus:2.2.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
 repositories {
     mavenCentral()
