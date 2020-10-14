@@ -38,3 +38,4 @@ Thumbs.db
 /gradle/
 /gradlew*
 local.properties.tmp
+.DS_Store

@@ -4,12 +4,21 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 30
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
     defaultConfig {
         applicationId "de.devmil.muzei.bingimageofthedayartsource"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "2.0"
 
         archivesBaseName = "muzei_biot-v${defaultConfig.versionName}-${buildTime()}"
 
