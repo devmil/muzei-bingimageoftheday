@@ -103,7 +103,7 @@ class SettingsActivity : Activity() {
             rbPortrait!!.setOnCheckedChangeListener(listener)
             spMarket!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-                    val market = marketAdapter!!.getItem(i)
+                    val market = marketAdapter?.getItem(i)!!
                     settings.bingMarket = market
                     EventBus.getDefault().post(RequestMarketSettingChangedEvent(activity))
                 }

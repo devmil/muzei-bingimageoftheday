@@ -31,11 +31,6 @@ class UpdateReceiver : BroadcastReceiver() {
             LogUtil.LOGD(TAG, "Updating provider")
             BingImageOfTheDayArtProvider.doUpdate()
         }
-
-        if(!(BingImageOfTheDayArtProvider.isActive ?: true)) {
-            LogUtil.LOGD(TAG, "Updating art source")
-            BingImageOfTheDayArtSource.ensureInitialized(context)
-        }
     }
 
     companion object {

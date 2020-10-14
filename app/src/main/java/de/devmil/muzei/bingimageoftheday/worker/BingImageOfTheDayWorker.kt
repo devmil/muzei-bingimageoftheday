@@ -11,7 +11,6 @@ import com.google.android.apps.muzei.api.provider.Artwork
 import com.google.android.apps.muzei.api.provider.ProviderContract
 import de.devmil.common.utils.LogUtil
 import de.devmil.muzei.bingimageoftheday.*
-import de.devmil.muzei.bingimageoftheday.BuildConfig.BING_IMAGE_OF_THE_DAY_AUTHORITY
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -75,14 +74,15 @@ class BingImageOfTheDayWorker(
                 val minDiff = 1000 /* seconds */ * 60 /* minutes */ * 2
                 if(!requestOverride && millisDiff < minDiff) {
                     LogUtil.LOGD(TAG, "Last update was less than 2 minutes ago => ignoring")
-                    return Result.SUCCESS
+                    return Result.success()
                 }
             }
             lastArtworkUpdate = now
 
             //Default = request the image list from Bing
             var requestNewImages = true
-            val lastArtwork = ProviderContract.Artwork.getLastAddedArtwork(applicationContext, BING_IMAGE_OF_THE_DAY_AUTHORITY)
+            val lastArtwork = ProviderContract.getProviderClient<BingImageOfTheDayArtProvider>(applicationContext)
+                    .lastAddedArtwork
             if (lastArtwork != null) {
                 LogUtil.LOGD(TAG, "Found last artwork")
                 val timeInMillis = lastArtwork.metadata?.toLongOrNull()
@@ -103,7 +103,7 @@ class BingImageOfTheDayWorker(
                 requestNewImages = true
             }
             if (!requestNewImages) {
-                return Result.SUCCESS
+                return Result.success()
             }
 
             LogUtil.LOGD(TAG, "Reloading Bing images")
@@ -118,23 +118,23 @@ class BingImageOfTheDayWorker(
                 retriever.bingImageOfTheDayMetadata ?: listOf()
             } catch (e: IOException) {
                 Log.w(TAG, "Error reading Bing response", e)
-                return Result.RETRY
+                return Result.retry()
             }
 
             if (photosMetadata.isEmpty()) {
                 Log.w(TAG, "No photos returned from Bing API.")
-                return Result.FAILURE
+                return Result.failure()
             }
 
             photosMetadata.asSequence().map { metadata ->
-                Artwork().apply {
-                    token = getToken(metadata.startDate, market, isPortrait)
-                    title = metadata.startDate?.let { getImageTitle(it) } ?: ""
-                    byline = metadata.copyright ?: ""
-                    persistentUri = metadata.uri
-                    webUri = metadata.uri
-                    this.metadata = metadata.startDate?.time.toString()
-                }
+                Artwork(
+                    token = getToken(metadata.startDate, market, isPortrait),
+                    title = metadata.startDate?.let { getImageTitle(it) } ?: "",
+                    byline = metadata.copyright ?: "",
+                    persistentUri = metadata.uri,
+                    webUri = metadata.uri,
+                    metadata = metadata.startDate?.time.toString()
+                )
             }.sortedByDescending { aw ->
                 aw.metadata?.toLongOrNull() ?: 0
             }.firstOrNull()
@@ -145,7 +145,7 @@ class BingImageOfTheDayWorker(
                 settings.isCurrentOrientationPortrait = isPortrait
                 settings.currentBingMarket = market
             }
-            return Result.SUCCESS
+            return Result.success()
         }
     }
 
@@ -171,7 +171,8 @@ class BingImageOfTheDayWorker(
 
     private fun setArtwork(artwork: Artwork) {
         LogUtil.LOGD(TAG, "Setting artwork: ${artwork.metadata?.toLongOrNull()?.let { Date(it) }}, ${artwork.title}")
-        ProviderContract.Artwork.setArtwork(applicationContext, BingImageOfTheDayArtProvider::class.java, artwork)
+        ProviderContract.getProviderClient<BingImageOfTheDayArtProvider>(applicationContext)
+                .setArtwork(artwork)
     }
 
     private fun requestNextImageUpdate(currentImageDate: Date): Calendar {

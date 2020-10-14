@@ -15,53 +15,28 @@
  */
 package de.devmil.muzei.bingimageoftheday
 
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.IBinder
-import com.google.android.apps.muzei.api.MuzeiArtSource
-import com.google.android.apps.muzei.api.RemoteMuzeiArtSource
-import com.google.android.apps.muzei.api.UserCommand
-import de.devmil.common.utils.LogUtil
 
 /**
- * Muzei Art source for Bing images of the day.
- * This class is the plugin entry point for Muzei
+ * This class is kept only to serve as a tombstone to Muzei to know to replace it
+ * with [BingImageOfTheDayArtProvider].
  */
-class BingImageOfTheDayArtSource : RemoteMuzeiArtSource("de.devmil.muzei.Bing") {
+class BingImageOfTheDayArtSource : Service() {
 
-    override fun onBind(intent: Intent?): IBinder? {
-        throw UnsupportedOperationException("Not yet implemented")
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        setUserCommands(
-                UserCommand(MuzeiArtSource.BUILTIN_COMMAND_ID_NEXT_ARTWORK))
-    }
-
-    @Throws(RemoteMuzeiArtSource.RetryException::class)
-    override fun onTryUpdate(updateReason: Int) {
-        //NOOP
+    override fun onBind(intent: Intent): IBinder? {
+        return null
     }
 
     companion object {
 
-        private val TAG = LogUtil.makeLogTag(BingImageOfTheDayArtSource::class.java)
-
-        private val SOURCE_NAME = "BingImageOfTheDayArtSource"
-
-        private val ACTION_ENSUREINITIALIZED = "de.devmil.muzei.bingimageoftheday.ACTION_ENSURE_INITIALIZED"
+        private const val SOURCE_NAME = "BingImageOfTheDayArtSource"
 
         fun getSharedPreferences(context: Context): SharedPreferences {
-            return MuzeiArtSource.getSharedPreferences(context, SOURCE_NAME)
-        }
-
-        fun ensureInitialized(context: Context) {
-            val thisServiceIntent = Intent()
-            thisServiceIntent.setClass(context, BingImageOfTheDayArtSource::class.java)
-            thisServiceIntent.action = ACTION_ENSUREINITIALIZED
-            context.startService(thisServiceIntent)
+            return context.getSharedPreferences("muzeiartsource_$SOURCE_NAME", 0)
         }
     }
 }
