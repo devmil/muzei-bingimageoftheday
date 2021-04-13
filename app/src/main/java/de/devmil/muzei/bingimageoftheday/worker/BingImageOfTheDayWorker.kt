@@ -110,7 +110,7 @@ class BingImageOfTheDayWorker(
 
             val retriever = BingImageOfTheDayMetadataRetriever(
                     market,
-                    BingImageDimension.HD,
+                    BingImageDimension.UHD,
                     isPortrait
             )
 

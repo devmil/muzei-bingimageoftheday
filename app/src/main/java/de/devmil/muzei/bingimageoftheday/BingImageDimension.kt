@@ -5,15 +5,30 @@ package de.devmil.muzei.bingimageoftheday
 
  * Represents the available Bing Image dimensions and all logic around them (e.g. orientation mapping)
  */
-enum class BingImageDimension constructor(val code: Int, private val shortDimension: Int, private val longDimension: Int) {
+enum class BingImageDimension {
     WVGA(1, 480, 800),
     WXGA(2, 768, 1280),
-    HD(3, 1080, 1920);
+    HD(3, 1080, 1920),
+    UHD(4, "1080x1920", "UHD");
+
+    private val code : Int;
+    private val stringRepPortrait: String;
+    private val stringRepLandscape: String;
+
+    constructor(code: Int, shortDimension: Int, longDimension: Int) {
+        this.code = code;
+        stringRepPortrait = String.format("%dx%d", shortDimension, longDimension);
+        stringRepLandscape = String.format("%dx%d", longDimension, shortDimension);
+    }
+
+    constructor(code: Int, stringRepPortrait: String, stringRepLandscape : String) {
+        this.code = code;
+        this.stringRepPortrait = stringRepPortrait;
+        this.stringRepLandscape = stringRepLandscape;
+    }
 
     fun getStringRepresentation(portrait: Boolean): String {
-        val width = if (portrait) shortDimension else longDimension
-        val height = if (portrait) longDimension else shortDimension
-        return String.format("%dx%d", width, height)
+        return if (portrait) stringRepPortrait else stringRepLandscape
     }
 
     companion object {
@@ -23,7 +38,9 @@ enum class BingImageDimension constructor(val code: Int, private val shortDimens
                 return WVGA
             if (WXGA.code == code)
                 return WXGA
-            return WXGA
+            if (HD.code == code)
+                return HD
+            return UHD
         }
     }
 }

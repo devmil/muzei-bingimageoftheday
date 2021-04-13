@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId "de.devmil.muzei.bingimageofthedayartsource"
         minSdkVersion 19
-        targetSdkVersion 28
-        versionCode 9
-        versionName "2.0"
+        targetSdkVersion 29
+        versionCode 10
+        versionName "2.1"
 
         archivesBaseName = "muzei_biot-v${defaultConfig.versionName}-${buildTime()}"
 
