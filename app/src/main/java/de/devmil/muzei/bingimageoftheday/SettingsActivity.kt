@@ -26,14 +26,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.CompoundButton
-import android.widget.ImageView
-import android.widget.RadioButton
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 
 import de.devmil.muzei.bingimageoftheday.events.RequestMarketSettingChangedEvent
 import de.devmil.muzei.bingimageoftheday.events.RequestPortraitSettingChangedEvent
@@ -73,6 +66,7 @@ class SettingsActivity : Activity() {
         private var spMarket: Spinner? = null
         private var marketAdapter: ArrayAdapter<BingMarket>? = null
         private var btnLicense: Button? = null
+        private var cbStore: CheckBox? = null;
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                                   savedInstanceState: Bundle?): View? {
@@ -84,12 +78,21 @@ class SettingsActivity : Activity() {
             spMarket!!.adapter = marketAdapter
             spMarket!!.setSelection(GetMarketSpinnerSelection())
             btnLicense = rootView.findViewById(R.id.fragment_settings_button_license) as Button
+            cbStore = rootView.findViewById(R.id.fragment_settings_checkbox_store) as CheckBox
 
             val settings = Settings(activity, BingImageOfTheDayArtSource.getSharedPreferences(activity))
             val portrait = settings.isOrientationPortrait
 
             rbLandscape!!.isChecked = !portrait
             rbPortrait!!.isChecked = portrait
+
+            cbStore!!.isChecked = settings.isStoreImages
+
+            val storeListener = CompoundButton.OnCheckedChangeListener { compoundButton, checked ->
+                settings.isStoreImages = checked
+            }
+
+            cbStore!!.setOnCheckedChangeListener(storeListener)
 
             val listener = CompoundButton.OnCheckedChangeListener { compoundButton, checked ->
                 if (!checked)

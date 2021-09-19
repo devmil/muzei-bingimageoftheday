@@ -5,12 +5,12 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 
 /**
-* Created by michaellamers on 05.05.15.
-*/
+ * Created by michaellamers on 05.05.15.
+ */
 class Settings(private val context: Context, private val preferences: SharedPreferences) {
 
     @Suppress("DEPRECATION")
-            // Try find best match based on local
+    // Try find best match based on local
     // no best match? Default!
     var bingMarket: BingMarket
         get() {
@@ -50,6 +50,12 @@ class Settings(private val context: Context, private val preferences: SharedPref
             preferences.edit().putBoolean(PREF_ORIENTATION_PORTRAIT, isOrientationPortrait).apply()
         }
 
+    var isStoreImages: Boolean
+        get() = preferences.getBoolean(PREF_STORE_IMAGES, false)
+        set(isStoreImages) {
+            preferences.edit().putBoolean(PREF_STORE_IMAGES, isStoreImages).apply()
+        }
+
     var isCurrentOrientationPortrait: Boolean
         get() = preferences.getBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, isOrientationPortrait)
         set(isCurrentOrientationPortrait) {
@@ -58,6 +64,7 @@ class Settings(private val context: Context, private val preferences: SharedPref
                     .putBoolean(PREF_CURRENT_ORIENTATION_PORTRAIT, isCurrentOrientationPortrait)
                     .apply()
         }
+
 
     var currentImageNumber: Int
         get() = preferences.getInt(PREF_CURRENT_IMAGE_NUM, 0)
@@ -71,6 +78,7 @@ class Settings(private val context: Context, private val preferences: SharedPref
     companion object {
         private val PREF_MARKET_CODE = "art_source_settings_market_code"
         private val PREF_ORIENTATION_PORTRAIT = "art_source_settings_orientation_portrait"
+        private val PREF_STORE_IMAGES = "art_source_settings_store_images"
         private val PREF_CURRENT_IMAGE_NUM = "art_source_runtime_current_image_number"
         private val PREF_CURRENT_MARKET = "art_source_runtime_current_market"
         private val PREF_CURRENT_ORIENTATION_PORTRAIT = "art_source_runtime_current_orientation_portrait"

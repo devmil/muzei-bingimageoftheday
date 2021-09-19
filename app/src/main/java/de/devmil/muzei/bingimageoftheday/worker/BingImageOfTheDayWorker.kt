@@ -1,19 +1,24 @@
 package de.devmil.muzei.bingimageoftheday.worker
 
 import android.app.AlarmManager
+import android.app.DownloadManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
+import android.os.Environment
 import android.util.Log
 import androidx.work.*
 import com.google.android.apps.muzei.api.provider.Artwork
 import com.google.android.apps.muzei.api.provider.ProviderContract
 import de.devmil.common.utils.LogUtil
 import de.devmil.muzei.bingimageoftheday.*
+import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
 
 class BingImageOfTheDayWorker(
         val context: Context,
@@ -38,7 +43,7 @@ class BingImageOfTheDayWorker(
         private var lastArtworkUpdate: Calendar? = null
     }
 
-    private fun getSharedPreferences() : SharedPreferences {
+    private fun getSharedPreferences(): SharedPreferences {
         return applicationContext.getSharedPreferences("muzeiartsource_$SETTINGS_NAME", 0)
     }
 
@@ -72,7 +77,7 @@ class BingImageOfTheDayWorker(
             lastArtworkUpdate?.let {
                 val millisDiff = now.timeInMillis - it.timeInMillis
                 val minDiff = 1000 /* seconds */ * 60 /* minutes */ * 2
-                if(!requestOverride && millisDiff < minDiff) {
+                if (!requestOverride && millisDiff < minDiff) {
                     LogUtil.LOGD(TAG, "Last update was less than 2 minutes ago => ignoring")
                     return Result.success()
                 }
@@ -128,34 +133,88 @@ class BingImageOfTheDayWorker(
 
             photosMetadata.asSequence().map { metadata ->
                 Artwork(
-                    token = getToken(metadata.startDate, market, isPortrait),
-                    title = metadata.startDate?.let { getImageTitle(it) } ?: "",
-                    byline = metadata.copyright ?: "",
-                    persistentUri = metadata.uri,
-                    webUri = metadata.uri,
-                    metadata = metadata.startDate?.time.toString()
+                        token = getToken(metadata.startDate, market, isPortrait),
+                        title = metadata.startDate?.let { getImageTitle(it) } ?: "",
+                        byline = metadata.copyright ?: "",
+                        persistentUri = metadata.uri,
+                        webUri = metadata.uri,
+                        metadata = metadata.startDate?.time.toString()
                 )
             }.sortedByDescending { aw ->
                 aw.metadata?.toLongOrNull() ?: 0
             }.firstOrNull()
-            ?.let { artwork ->
-                Log.d(TAG, "Got artworks. Selected this one: ${artwork.title} valid on: ${Date(artwork.metadata!!.toLong())}")
-                requestNextImageUpdate(Date(artwork.metadata!!.toLong()))
-                setArtwork(artwork)
-                settings.isCurrentOrientationPortrait = isPortrait
-                settings.currentBingMarket = market
-            }
+                    ?.let { artwork ->
+                        Log.d(TAG, "Got artworks. Selected this one: ${artwork.title} valid on: ${Date(artwork.metadata!!.toLong())}")
+                        requestNextImageUpdate(Date(artwork.metadata!!.toLong()))
+                        setArtwork(artwork)
+                        settings.isCurrentOrientationPortrait = isPortrait
+                        settings.currentBingMarket = market
+                        if (settings.isStoreImages) {
+                            downloadImage(artwork, isPortrait)
+                        }
+                    }
             return Result.success()
         }
     }
 
+    private fun downloadImage(artwork: Artwork, isPortrait: Boolean) {
+        val downloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+        val downloadUri = artwork.webUri
+        val uriString = artwork.webUri.toString()
+
+        val fileNameIndex = max(uriString.lastIndexOf("/"), uriString.lastIndexOf("="))
+
+        val fileName = artwork.metadata + "_" + uriString.substring(fileNameIndex + 1)
+        val fileNameAlternative = fileName.replace(BingImageDimension.UHD.getStringRepresentation(isPortrait), BingImageDimension.UHD.getStringRepresentation(!isPortrait))
+
+        val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + File.separator + "Bing Image of the Day" + File.separator + fileName
+        val filePathAlternative = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + File.separator + "Bing Image of the Day" + File.separator + fileNameAlternative
+
+        LogUtil.LOGD(TAG, "Downloading: $fileName to $filePath")
+
+        if (!File(filePath).exists()) {
+            val requestCurrent = DownloadManager.Request(downloadUri).apply {
+                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+                        .setAllowedOverRoaming(false)
+                        .setTitle("Downloading current Bing Image ($fileName)")
+                        .setDescription("")
+                        .setMimeType("image/jpeg")
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION)
+                        .setDestinationInExternalPublicDir(
+                                Environment.DIRECTORY_PICTURES,
+                                File.separator + "Bing Image of the Day" + File.separator + fileName
+                        )
+            }
+
+            downloadManager.enqueue(requestCurrent)
+        }
+
+        if (!File(filePathAlternative).exists()) {
+            val requestAlternative = DownloadManager.Request(downloadUri).apply {
+                setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+                        .setAllowedOverRoaming(false)
+                        .setTitle("Downloading alternative Bing Image ($fileNameAlternative)")
+                        .setDescription("")
+                        .setMimeType("image/jpeg")
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                        .setDestinationInExternalPublicDir(
+                                Environment.DIRECTORY_PICTURES,
+                                File.separator + "Bing Image of the Day" + File.separator + fileNameAlternative
+                        )
+            }
+
+            downloadManager.enqueue(requestAlternative)
+        }
+    }
+
     private fun getToken(startDate: Date?, market: BingMarket, isPortrait: Boolean): String {
-        val result = "$startDate-$market-${if(isPortrait) "portrait" else "landscape"}"
+        val result = "$startDate-$market-${if (isPortrait) "portrait" else "landscape"}"
         LogUtil.LOGD(TAG, "Token: $result")
         return result
     }
 
-    private fun isNewestBingImage(newestBingImageDate: Date) : Boolean {
+    private fun isNewestBingImage(newestBingImageDate: Date): Boolean {
         val now = Calendar.getInstance().time
         val nextBingImageDate = getNextBingImageDate(newestBingImageDate)
 
@@ -187,7 +246,7 @@ class BingImageOfTheDayWorker(
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
-        val updateIntent = Intent(context,  UpdateReceiver::class.java)
+        val updateIntent = Intent(context, UpdateReceiver::class.java)
         val pendingUpdateIntent = PendingIntent.getBroadcast(context, 1, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         alarmManager?.set(AlarmManager.RTC_WAKEUP, nextUpdate.timeInMillis, pendingUpdateIntent)

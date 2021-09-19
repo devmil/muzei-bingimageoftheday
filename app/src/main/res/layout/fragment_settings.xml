@@ -35,24 +35,28 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/fragment_settings_orientation_label"
             android:orientation="vertical">
+
             <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/setting_landscape"
                 android:id="@+id/fragment_settings_orientation_landscape"
-                android:fontFamily="sans-serif-condensed"
-                android:textAllCaps="true"
-                android:textColor="#fff"
-                android:textStyle="bold"/>
-            <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/setting_portrait"
-                android:id="@+id/fragment_settings_orientation_portrait"
                 android:fontFamily="sans-serif-condensed"
+                android:minHeight="48dp"
+                android:text="@string/setting_landscape"
                 android:textAllCaps="true"
                 android:textColor="#fff"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/fragment_settings_orientation_portrait"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:minHeight="48dp"
+                android:text="@string/setting_portrait"
+                android:textAllCaps="true"
+                android:textColor="#fff"
+                android:textStyle="bold" />
         </RadioGroup>
         <TextView
             android:id="@+id/fragment_settings_market_label"
@@ -67,12 +71,22 @@
             android:textColor="#fff"
             android:textStyle="bold"
             />
+
         <Spinner
             android:id="@+id/fragment_settings_market"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/fragment_settings_market_label"
-            android:layout_marginTop="0dp"/>
+            android:layout_marginTop="0dp"
+            android:minHeight="48dp" />
+
+        <CheckBox
+            android:id="@+id/fragment_settings_checkbox_store"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/fragment_settings_market"
+            android:minHeight="48dp"
+            android:text="Store images" />
 
         <Button
             android:id="@+id/fragment_settings_button_license"
@@ -81,7 +95,7 @@
             android:text="@string/fragment_settings_button_license_label"
             android:textAllCaps="true"
             android:textAppearance="?android:textAppearanceLarge"
-            android:layout_below="@id/fragment_settings_market"
+            android:layout_below="@id/fragment_settings_checkbox_store"
             android:layout_marginTop="20dp"/>
     </RelativeLayout>
 </ScrollView>
