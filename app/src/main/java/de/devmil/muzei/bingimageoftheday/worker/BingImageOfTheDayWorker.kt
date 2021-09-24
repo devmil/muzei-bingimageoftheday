@@ -160,13 +160,14 @@ class BingImageOfTheDayWorker(
     private fun downloadImage(artwork: Artwork, isPortrait: Boolean) {
         val downloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-        val downloadUri = artwork.webUri
-        val uriString = artwork.webUri.toString()
+        val downloadUri = artwork.webUri.toString()
+        val downloadUriAlternative = artwork.webUri.toString().replace(BingImageDimension.UHD.getStringRepresentation(isPortrait), BingImageDimension.UHD.getStringRepresentation(!isPortrait))
 
-        val fileNameIndex = max(uriString.lastIndexOf("/"), uriString.lastIndexOf("="))
+        val fileNameIndex = max(downloadUri.lastIndexOf("/"), downloadUri.lastIndexOf("="))
+        val fileNameAlternativeIndex = max(downloadUriAlternative.lastIndexOf("/"), downloadUriAlternative.lastIndexOf("="))
 
-        val fileName = artwork.metadata + "_" + uriString.substring(fileNameIndex + 1)
-        val fileNameAlternative = fileName.replace(BingImageDimension.UHD.getStringRepresentation(isPortrait), BingImageDimension.UHD.getStringRepresentation(!isPortrait))
+        val fileName = artwork.metadata + "_" + downloadUri.substring(fileNameIndex + 1)
+        val fileNameAlternative = artwork.metadata + "_" + downloadUriAlternative.substring(fileNameAlternativeIndex + 1)
 
         val filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + File.separator + "Bing Image of the Day" + File.separator + fileName
         val filePathAlternative = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + File.separator + "Bing Image of the Day" + File.separator + fileNameAlternative
@@ -174,7 +175,7 @@ class BingImageOfTheDayWorker(
         LogUtil.LOGD(TAG, "Downloading: $fileName to $filePath")
 
         if (!File(filePath).exists()) {
-            val requestCurrent = DownloadManager.Request(downloadUri).apply {
+            val requestCurrent = DownloadManager.Request(Uri.parse(downloadUri)).apply {
                 setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                         .setAllowedOverRoaming(false)
                         .setTitle("Downloading current Bing Image ($fileName)")
@@ -191,7 +192,7 @@ class BingImageOfTheDayWorker(
         }
 
         if (!File(filePathAlternative).exists()) {
-            val requestAlternative = DownloadManager.Request(downloadUri).apply {
+            val requestAlternative = DownloadManager.Request(Uri.parse(downloadUriAlternative)).apply {
                 setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                         .setAllowedOverRoaming(false)
                         .setTitle("Downloading alternative Bing Image ($fileNameAlternative)")
