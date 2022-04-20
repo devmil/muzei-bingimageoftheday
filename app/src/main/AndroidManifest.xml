@@ -16,8 +16,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="de.devmil.muzei.bingimageoftheday.SettingsActivity"
-            android:exported="true"
-            android:label="@string/app_name" >
+            android:exported="true">
         </activity>
 
         <activity
@@ -29,7 +28,8 @@
         <!-- Tombstone only used to redirect users when upgrading to Muzei 3.3+ -->
         <service
             android:name="de.devmil.muzei.bingimageoftheday.BingImageOfTheDayArtSource"
-            android:enabled="false" >
+            android:enabled="false"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
             </intent-filter>
