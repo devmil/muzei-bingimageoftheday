@@ -1,7 +1,7 @@
 # Muzei - Bing image of the day plugin
 This plugin shows the image of the day from Bing.
 
-[![Build status](https://devmil.visualstudio.com/Muzei%20Bing%20image%20of%20the%20day/_apis/build/status/Muzei%20Bing%20image%20of%20the%20day-Docker%20container-CI)](https://devmil.visualstudio.com/Muzei%20Bing%20image%20of%20the%20day/_build/latest?definitionId=2)
+[![Android CI](https://github.com/devmil/muzei-bingimageoftheday/actions/workflows/android.yml/badge.svg)](https://github.com/devmil/muzei-bingimageoftheday/actions/workflows/android.yml)
 
 Additionally to simply downloading the current image it caches the currently available set of images and allows to set the Bing market and orientation of the image.
 
