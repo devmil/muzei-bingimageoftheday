@@ -35,6 +35,5 @@ Thumbs.db
 
 .android
 
-/gradle/
 local.properties.tmp
 .DS_Store
