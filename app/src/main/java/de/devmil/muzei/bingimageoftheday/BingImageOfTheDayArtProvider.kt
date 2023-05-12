@@ -132,7 +132,7 @@ class BingImageOfTheDayArtProvider : MuzeiArtProvider() {
                         context.getString(R.string.command_share_title),
                         PendingIntent.getActivity(context, artwork.id.toInt(),
                                 createShareIntent(context, artwork),
-                                PendingIntent.FLAG_UPDATE_CURRENT))
+                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE))
         )
     }
 
