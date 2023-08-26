@@ -247,7 +247,7 @@ class BingImageOfTheDayWorker(
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
 
-        val updateIntent = Intent(context, UpdateReceiver::class.java)
+        val updateIntent = Intent(context,  UpdateReceiver::class.java)
         val pendingUpdateIntent = PendingIntent.getBroadcast(context, 1, updateIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
 
         alarmManager?.set(AlarmManager.RTC_WAKEUP, nextUpdate.timeInMillis, pendingUpdateIntent)
