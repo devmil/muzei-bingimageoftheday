@@ -25,19 +25,6 @@
             android:label="@string/license_info_activity_label">
         </activity>
 
-        <!-- Tombstone only used to redirect users when upgrading to Muzei 3.3+ -->
-        <service
-            android:name="de.devmil.muzei.bingimageoftheday.BingImageOfTheDayArtSource"
-            android:enabled="false"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
-            </intent-filter>
-            <meta-data
-                android:name="replacement"
-                android:value="de.devmil.muzei.bingimageoftheday.BingImageContentProvider"/>
-        </service>
-
         <!-- Replacement for FileProvider that works with BingImageOfTheDayArtProvider -->
         <provider
             android:name="de.devmil.muzei.bingimageoftheday.BingImageContentProvider"
