@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId "de.devmil.muzei.bingimageofthedayartsource"
         minSdkVersion 19
-        targetSdkVersion 33
-        versionCode 12
-        versionName "2.2"
+        targetSdkVersion 34
+        versionCode 13
+        versionName "2.3"
 
         archivesBaseName = "muzei_biot-v${defaultConfig.versionName}-${buildTime()}"
 
@@ -34,7 +34,7 @@ android {
             def propertiesFile = file('../Key/keystore.properties')
             if(propertiesFile.exists()) {
                 println "Keystore properties found! Building signed..."
-                def Properties keyProps = new Properties()
+                Properties keyProps = new Properties()
                 keyProps.load(new FileInputStream(propertiesFile))
                 storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
                 keyAlias keyProps["alias"]
